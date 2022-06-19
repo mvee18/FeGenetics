@@ -1,5 +1,5 @@
 use crate::utils::domain::random_float;
-use rand::Rng;
+use rand_distr::{Normal, Distribution};
 use rand::seq::SliceRandom;
 use std::option::Option;
 use uuid::Uuid;
@@ -13,6 +13,7 @@ const DOMAIN_UPPER: f64 = 10.0;
 
 const TARGET_LIST: &'static [f64] = &[2.0, 4.0, 6.0, 8.0, 10.0];
 const TOURNAMENT_SIZE: u32 = 3;
+const MUTATION_RATE: f64 = 0.01;
 
 // pub enum Organism {
 //         ForceOrganism(ForceOrganism),
@@ -21,7 +22,7 @@ const TOURNAMENT_SIZE: u32 = 3;
 
 // The Organism is a trait (interface).
 pub trait Organism {
-        fn fitness(&self) -> f64;
+        fn evaluate_fitness(&self, target: Vec<f64>) -> f64;
         fn crossover(&self, other: &Self) -> Self;
         fn mutate(&mut self);
 }
@@ -77,6 +78,16 @@ impl SimpleOrganism {
 
                 self.fitness = sum;
         }
+
+        pub fn mutation(&mut self) {
+                // Generate random float for mutation chance.
+                for i in 0..self.dna.len() {
+                        if random_float(0.0, 1.0) < MUTATION_RATE {
+                                let norm_distr = Normal::new(self.dna[i], 0.1).unwrap();
+                                self.dna[i] = norm_distr.sample(&mut rand::thread_rng());
+                        }
+                }
+        }
 }
 
 // Make the pool of organisms.
@@ -114,14 +125,34 @@ pub fn natural_selection(pool: &mut Vec<SimpleOrganism>) {
         // The number of iterations should be equal to the pool since we cut it in half.
         // That is, we must refill the pool.
         // TODO: Refill different fractions of the pool depending on the above function.
-        for _ in 0..pool.len() {
+        for _ in 0..new_pool.len() {
                 let mut parents: Vec<SimpleOrganism> = Vec::new();
                 for _ in 0..3 {
-                        parents.push(tournament_round(&pool.to_vec()));
+                        parents.push(tournament_round(&new_pool.to_vec()));
                 }
 
-                new_pool.push(quadratic_mating(&mut parents));
+                // We push onto the original pool.
+                pool.push(quadratic_mating(&mut parents));
         }
+}
+
+// Separate functionality for testing.
+fn make_tournament_group(grp: &mut Vec<SimpleOrganism>, pool: &Vec<SimpleOrganism>) {
+        // Each group will have TOURNAMENT_SIZE members.
+        // We don't want a duplicate organism. We will generate a sequence from 0 to the pool size.
+        // Then, we will shuffle the sequence and take the first TOURNAMENT_SIZE elements.
+        let mut v: Vec<u32> = (0..pool.len().try_into().unwrap()).collect();
+        v.shuffle(&mut rand::thread_rng());
+        for i in 0..TOURNAMENT_SIZE {
+                // Make sure it fits.
+                let index = usize::try_from(i).unwrap();
+
+                // Is clone necessary?
+                // Maybe there is a better way to do this with some sort of reference?
+                grp.push(pool[v[index] as usize].clone());
+        }
+
+        // println!("The group is: {:?}\n", grp);
 }
 
 // TODO: This test can fail if the same organism is selected twice. We should fix this.
@@ -129,15 +160,7 @@ pub fn tournament_round(pool: &Vec<SimpleOrganism>) -> SimpleOrganism {
         // The number of iterations should be equal to the pool since we cut it in half.
         // That is, we must refill the pool.
         let mut group: Vec<SimpleOrganism> = Vec::new();
-        // Each group will have TOURNAMENT_SIZE members.
-        for _ in 0..TOURNAMENT_SIZE {
-                let mut rng = rand::thread_rng();
-                let index = rng.gen_range(0..pool.len());
-                // Is clone necessary?
-                // Maybe there is a better way to do this with some sort of reference?
-                group.push(pool[index].clone());
-        }
-        println!("The group is: {:?}\n", group);
+        make_tournament_group(&mut group, pool);
         // Sort the group by fitness.
         group.sort_by(|a, b| a.fitness.partial_cmp(&b.fitness).unwrap());
         // Return the most fit organism.
@@ -170,7 +193,7 @@ pub fn quadratic_mating(parents: &mut Vec<SimpleOrganism>) -> SimpleOrganism {
                 let critical_point: f64= b / (-2.0 * a);
                 let concavity = 2.0*a; 
 
-                println!("{} {} {} {} {}", p1.dna[i], p2.dna[i], p3.dna[i], critical_point, concavity);
+                // println!("{} {} {} {} {}", p1.dna[i], p2.dna[i], p3.dna[i], critical_point, concavity);
 
                 // If the concavity is positive (minimized), then we should use the critical point.
                 if concavity > 0.0 && (critical_point.abs() > DOMAIN_LOWER && critical_point.abs() < DOMAIN_UPPER) {
@@ -180,7 +203,7 @@ pub fn quadratic_mating(parents: &mut Vec<SimpleOrganism>) -> SimpleOrganism {
                         let result = linear_interpolation(p1.dna[i], p3.dna[i]);
                         match result {
                                 Some(x) => child.dna.push(x),
-                                // If none, we randomly select one of the parents.
+                                // If None, i.e., the linear interpolation failed, we randomly select one of the parents.
                                 None => {
                                         let rand_parent = parents.choose(&mut rand::thread_rng()).unwrap();
                                         child.dna.push(rand_parent.dna[i]);
@@ -192,12 +215,12 @@ pub fn quadratic_mating(parents: &mut Vec<SimpleOrganism>) -> SimpleOrganism {
 
         // Evaluate the fitness of the child.
         child.evalute_fitness(TARGET_LIST.to_vec());
+        child.mutation();
         return child;
 }
 
 // We interpolate between the most fit and least fit organisms.
 pub fn linear_interpolation(best: f64, worst: f64) -> Option<f64> {
-        let mut rng = rand::thread_rng();
         let mut beta = rand::random::<f64>();
 
         // Keep a counter for the number of iterations.
@@ -212,7 +235,7 @@ pub fn linear_interpolation(best: f64, worst: f64) -> Option<f64> {
                 beta = beta / 2.0;
                 dna = beta * (best - worst) + worst;
                 counter += 1;
-                // If we have exceeded the number of iterations, then we should return an error.
+                // If we have exceeded the number of iterations, then we should return None.
                 if counter > 3 {
                         return None;
                 }
@@ -220,7 +243,6 @@ pub fn linear_interpolation(best: f64, worst: f64) -> Option<f64> {
 
         return Some(dna);
 }
-
 
 
 #[cfg(test)]
@@ -252,7 +274,7 @@ mod tests {
 
                 test_org.evalute_fitness(target);
 
-                println!("Wanted fitness: 5.0, got fitness: {}", test_org.fitness);
+                // println!("Wanted fitness: 5.0, got fitness: {}", test_org.fitness);
 
                 assert_eq!(test_org.fitness, 5.0);
         }
@@ -278,6 +300,26 @@ mod tests {
 
                 assert_eq!(pool[0].fitness, 1.0);
                 assert_eq!(pool[1].fitness, 2.0);
+        }
+
+        #[test]
+        fn test_tournament_group_maker() {
+                let mut group: Vec<SimpleOrganism> = Vec::new();
+                let pool: Vec<SimpleOrganism> = generate_test_organism()[1..4].to_vec();
+
+                make_tournament_group(&mut group, &pool);
+
+                // Check that there are no duplicate organisms in the group.
+                let mut unique_orgs: Vec<SimpleOrganism> = Vec::new();
+                for org in group.iter() {
+                        if !unique_orgs.contains(&org) {
+                                unique_orgs.push(org.clone());
+                        }
+                }
+                
+                // Check that the number of unique organisms is equal to the
+                // number of organisms in the group.
+                assert_eq!(unique_orgs.len(), group.len());
         }
 
         #[test]
