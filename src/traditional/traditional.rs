@@ -1,8 +1,6 @@
-use crate::models::models::{create_organism_pool, eliminate_unfit_fractions, natural_selection};
+use crate::models::models::{create_organism_pool, eliminate_unfit_fractions, natural_selection, POPULATION_SIZE, FITNESS_THRESHOLD};
 use std::{time::Instant};
 
-const FITNESS_THRESHOLD: f64 = 1e-5;
-const POPULATION_SIZE: i32 = 100;
 
 pub fn run_tga() {
         // Get start time.

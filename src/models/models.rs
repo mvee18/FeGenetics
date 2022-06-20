@@ -11,20 +11,33 @@ const DOMAIN_LOWER: f64 = 0.0;
 #[allow(dead_code)]
 const DOMAIN_UPPER: f64 = 10.0;
 
+
+// Parameters for the genetic algorithms
 const TARGET_LIST: &'static [f64] = &[2.0, 4.0, 6.0, 8.0, 10.0];
 const TOURNAMENT_SIZE: u32 = 3;
 const MUTATION_RATE: f64 = 0.01;
-
-// pub enum Organism {
-//         ForceOrganism(ForceOrganism),
-//         SimpleOrganism(SimpleOrganism),
-// }
+pub const POPULATION_SIZE: i32 = 100;
+pub const FITNESS_THRESHOLD: f64 = 1e-5;
 
 // The Organism is a trait (interface).
-pub trait Organism {
-        fn evaluate_fitness(&self, target: Vec<f64>) -> f64;
-        fn crossover(&self, other: &Self) -> Self;
+pub trait Organism: Sized {
+        fn new(size: i32) -> Self;
+        fn new_population(size: i32) -> Vec<Self> {
+                let mut population = Vec::new();
+                for _ in 0..size {
+                        let mut organism = Self::new(size);
+                        organism.evaluate_fitness(TARGET_LIST.to_vec());
+                        population.push(organism);
+                }
+                population    
+        }
+        fn evaluate_fitness(&mut self, target: Vec<f64>);
         fn mutate(&mut self);
+}
+
+pub trait Populations {
+        fn eliminate_unfit_fractions(&mut self);
+        fn natural_selection(&mut self);
 }
 
 #[derive(Debug)]
@@ -41,8 +54,8 @@ pub struct SimpleOrganism {
         pub fitness: f64,
 }
 
-impl SimpleOrganism {
-        pub fn new(dna_size: i32) -> SimpleOrganism {
+impl Organism for SimpleOrganism {
+        fn new(dna_size: i32) -> SimpleOrganism {
                 let id = Uuid::new_v4().to_string();
 
                 let mut o = SimpleOrganism {
@@ -58,28 +71,18 @@ impl SimpleOrganism {
                 return o;
         }
 
-        pub fn new_debug(id: String, dna: Vec<f64>) -> SimpleOrganism {
-                let mut o = SimpleOrganism {
-                        id: id,
-                        dna: Vec::new(),
-                        fitness: 0.0,
-                };
-
-                o.dna = dna;
-                return o;
-        }
-
-        pub fn evalute_fitness(&mut self, target: Vec<f64>) {
+        fn evaluate_fitness(&mut self, target: Vec<f64>) {
                 assert_eq!(self.dna.len(), target.len());
                 let mut sum: f64 = 0.0;
                 for i in 0..self.dna.len() {
                         sum += difference_squared(self.dna[i], target[i]);
                 }
 
-                self.fitness = sum;
+                // MSE = mean squared error
+                self.fitness = sum / (self.dna.len() as f64);
         }
 
-        pub fn mutation(&mut self) {
+        fn mutate(&mut self) {
                 // Generate random float for mutation chance.
                 for i in 0..self.dna.len() {
                         if random_float(0.0, 1.0) < MUTATION_RATE {
@@ -90,15 +93,16 @@ impl SimpleOrganism {
         }
 }
 
+
 // Make the pool of organisms.
 // TODO: Later, this should use the enum to make the pool of organisms.
 pub fn create_organism_pool(size: i32) -> Vec<SimpleOrganism> {
         // Initialize the empty pool.
         let mut pool: Vec<SimpleOrganism> = Vec::new();
         // Create the organisms up to the size.
-        for i in 0..size {
+        for _ in 0..size {
                 let mut o = SimpleOrganism::new(DNA_SIZE.try_into().unwrap());
-                o.evalute_fitness(TARGET_LIST.to_vec());
+                o.evaluate_fitness(TARGET_LIST.to_vec());
                 pool.push(o);
         }
         pool
@@ -121,7 +125,7 @@ pub fn eliminate_unfit_fractions(pool: &mut Vec<SimpleOrganism>) {
 
 pub fn natural_selection(pool: &mut Vec<SimpleOrganism>) {
         // Copy the original pool so we don't use the new organisms in the mating.
-        let mut new_pool = pool.clone();
+        let new_pool = pool.clone();
         // The number of iterations should be equal to the pool since we cut it in half.
         // That is, we must refill the pool.
         // TODO: Refill different fractions of the pool depending on the above function.
@@ -214,8 +218,8 @@ pub fn quadratic_mating(parents: &mut Vec<SimpleOrganism>) -> SimpleOrganism {
         }
 
         // Evaluate the fitness of the child.
-        child.evalute_fitness(TARGET_LIST.to_vec());
-        child.mutation();
+        child.evaluate_fitness(TARGET_LIST.to_vec());
+        child.mutate();
         return child;
 }
 
@@ -272,7 +276,7 @@ mod tests {
                 };
                 let target: Vec<f64> = vec![1.0, 2.0, 3.0];
 
-                test_org.evalute_fitness(target);
+                test_org.evaluate_fitness(target);
 
                 // println!("Wanted fitness: 5.0, got fitness: {}", test_org.fitness);
 
