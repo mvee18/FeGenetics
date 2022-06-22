@@ -28,6 +28,10 @@ pub fn run_tga() {
                         return
                 }
 
+                if generation % 100 == 0 {
+                        println!("Generation {}: The best organism's fitness is {}.", generation, best_organism.fitness);
+                }
+
                 // Otherwise, we eliminiate the worst half of the population.
                 eliminate_unfit_fraction(&mut population);
 

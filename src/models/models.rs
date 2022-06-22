@@ -1,9 +1,11 @@
-use crate::utils::domain::random_float;
+use crate::utils::{domain::{random_float, random_float_mc}};
 use rand_distr::{Normal, Distribution};
 use rand::seq::SliceRandom;
 use std::option::Option;
 use uuid::Uuid;
 use std::any::Any;      
+use strum::IntoEnumIterator;
+use crate::utils::domain::{Derivatives, determine_number_force_constants, SECOND_DOMAIN, THIRD_DOMAIN, FOURTH_DOMAIN};
 
 #[allow(dead_code)] // The DNA Size will always be positive (non-negative) and therefore is u32.
 const DNA_SIZE: u32 = 5;
@@ -19,6 +21,7 @@ const TOURNAMENT_SIZE: u32 = 3;
 const MUTATION_RATE: f64 = 0.01;
 pub const POPULATION_SIZE: i32 = 100;
 pub const FITNESS_THRESHOLD: f64 = 1e-5;
+pub const NUMBER_ATOMS: i32 = 3;
 
 // The Organism is a trait (interface).
 pub trait Organism {
@@ -135,8 +138,8 @@ impl Population for Vec<SimpleOrganism> {
 #[derive(Debug, Clone, PartialEq)]
 pub struct ForceOrganism {
         pub id: String,
-        pub dna: Vec<Vec<Vec<f64>>>,
-        pub fitness: f32,
+        pub dna: Vec<Vec<f64>>,
+        pub fitness: f64,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -193,35 +196,54 @@ impl Organism for SimpleOrganism {
         }
 }
 
+impl Organism for ForceOrganism {
+        // Here, size is the number of atoms.
+        fn new(n_atoms: i32) -> Self where Self: Sized {
+                let id = Uuid::new_v4().to_string();
 
-// Make the pool of organisms.
-// TODO: Later, this should use the enum to make the pool of organisms.
-// pub fn create_organism_pool(size: i32) -> Vec<SimpleOrganism> {
-//         // Initialize the empty pool.
-//         let mut pool: Vec<SimpleOrganism> = Vec::new();
-//         // Create the organisms up to the size.
-//         for _ in 0..size {
-//                 let mut o = SimpleOrganism::new(DNA_SIZE.try_into().unwrap());
-//                 o.evaluate_fitness(TARGET_LIST.to_vec());
-//                 pool.push(o);
-//         }
-//         pool
-// }
+                let mut o = ForceOrganism {
+                        id: id,
+                        dna: Vec::with_capacity(3),
+                        fitness: 0.0,
+                };
+
+                for dn in Derivatives::iter() {
+                        let size = determine_number_force_constants(n_atoms, dn);
+                        // Make the chromosome that will be pushed onto the DNA.
+                        let mut chromosome: Vec<f64> = Vec::with_capacity(size.try_into().unwrap());
+                        
+                        for _ in 0..size {
+                                let gene = random_float_mc(dn);
+                                chromosome.push(gene);
+                        } 
+
+                        o.dna.push(chromosome);
+                }
+
+                return o;
+        }
+
+        fn get_fitness(&self) -> f64 {
+                return self.fitness;
+        }
+
+        fn evaluate_fitness(&mut self, target: Vec<f64>) {
+            unimplemented!()
+        }
+
+        fn mutate(&mut self) {
+                unimplemented!()
+        }
+
+        fn as_any(&self) -> &dyn Any {
+                self
+        }
+}
 
 fn difference_squared(a: f64, b: f64) -> f64 {
         let diff = a - b;
         diff * diff
 }
-
-// pub fn eliminate_unfit_fraction(pool: &mut Vec<SimpleOrganism>) {
-//         // Ensure the pool is an even number.
-//         assert_eq!(pool.len() % 2, 0);
-//         // Sort the pool by fitness.__rust_force_expr!
-//         pool.sort_by(|a, b| a.fitness.partial_cmp(&b.fitness).unwrap());
-//         // Remove the top half of the pool (i.e., the least fit).
-//         // TODO: Make this eliminate different fractions of the pool.
-//         pool.drain((pool.len() / 2)..pool.len());
-// }
 
 pub fn eliminate_unfit_fraction<T>(pool: &mut Vec<T>) 
 where T: Organism {
@@ -230,23 +252,6 @@ where T: Organism {
 
         pool.drain((pool.len() / 2)..pool.len());
 }
-
-// pub fn organism_natural_selection<T>(pool: &mut Vec<T>) where T: Organism, T: Clone {
-//         // Copy the original pool so we don't use the new organisms in the mating.
-//         let new_pool = pool.clone();
-//         // The number of iterations should be equal to the pool since we cut it in half.
-//         // That is, we must refill the pool.
-//         // TODO: Refill different fractions of the pool depending on the above function.
-//         for _ in 0..new_pool.len() {
-//                 let mut parents: Vec<T> = Vec::new();
-//                 for _ in 0..3 {
-//                         parents.push(tournament_round(&new_pool.to_vec()));
-//                 }
-
-//                 // We push onto the original pool.
-//                 pool.push(quadratic_mating(&mut parents));
-//         }
-// }
 
 pub fn tournament_round<T>(pool: &Vec<T>) -> T where T: Organism, T: Clone {
         // The number of iterations should be equal to the pool since we cut it in half.
@@ -277,61 +282,6 @@ fn make_tournament_group<T>(grp: &mut Vec<T>, pool: &Vec<T>) where T: Organism, 
 
         // println!("The group is: {:?}\n", grp);
 }
-
-// TODO: This test can fail if the same organism is selected twice. We should fix this.
-
-
-// pub fn quadratic_mating(parents: &mut Vec<SimpleOrganism>) -> SimpleOrganism {
-//         // There should always be three parents.
-//         assert_eq!(parents.len(), 3);
-//         // We should initialize the child.
-//         let mut child = SimpleOrganism{
-//                 id: Uuid::new_v4().to_string(),
-//                 // This makes push much less costly. We know the size of the DNA
-//                 // is going to be the same.
-//                 dna: Vec::with_capacity(DNA_SIZE.try_into().unwrap()),
-//                 fitness: 0.0,
-//         };
-
-//         // We need to sort the vector by fitness.
-//         parents.sort_by(|a, b| a.fitness.partial_cmp(&b.fitness).unwrap());
-
-//         // Now, we fit to a quadratic curve. The first parent is the most fit.
-//         let (p1, p2, p3) = (&parents[0], &parents[1], &parents[2]); 
-
-//         // Now, we iterate over the DNA of the first parent.
-//         for i in 0..p1.dna.len() {
-//                 let a = (1.0 / (p3.dna[i] - p2.dna[i])) * (((p3.fitness - p1.fitness) / (p3.dna[i] - p1.dna[i])) - ((p2.fitness - p1.fitness) / (p2.dna[i] - p1.dna[i])));
-//                 let b = ((p2.fitness - p1.fitness) / (p2.dna[i] - p1.dna[i])) - (a * (p2.dna[i] + p1.dna[i]));
-
-//                 let critical_point: f64= b / (-2.0 * a);
-//                 let concavity = 2.0*a; 
-
-//                 // println!("{} {} {} {} {}", p1.dna[i], p2.dna[i], p3.dna[i], critical_point, concavity);
-
-//                 // If the concavity is positive (minimized), then we should use the critical point.
-//                 if concavity > 0.0 && (critical_point.abs() > DOMAIN_LOWER && critical_point.abs() < DOMAIN_UPPER) {
-//                         child.dna.push(critical_point);
-//                 } else {
-//                         // Otherwise, we should use a linear interpolation.
-//                         let result = linear_interpolation(p1.dna[i], p3.dna[i]);
-//                         match result {
-//                                 Some(x) => child.dna.push(x),
-//                                 // If None, i.e., the linear interpolation failed, we randomly select one of the parents.
-//                                 None => {
-//                                         let rand_parent = parents.choose(&mut rand::thread_rng()).unwrap();
-//                                         child.dna.push(rand_parent.dna[i]);
-//                                 },
-//                         }
-//                 }
-
-//         }
-
-//         // Evaluate the fitness of the child.
-//         child.evaluate_fitness(TARGET_LIST.to_vec());
-//         child.mutate();
-//         return child;
-// }
 
 // We interpolate between the most fit and least fit organisms.
 pub fn linear_interpolation(best: f64, worst: f64) -> Option<f64> {
@@ -501,5 +451,42 @@ mod tests {
 
                         println!("Quadratic fitting: {:?}", result);
                 }
+
+        #[test]
+        // Water test case.
+        fn test_create_force_organism() {
+                let test_org = ForceOrganism::new(3);
+
+                println!("{:?}", test_org);
+
+                assert_eq!(test_org.dna.len(), 3);
+                assert_eq!(test_org.dna[0].len(), 81);
+                assert_eq!(test_org.dna[1].len(), 165);
+                assert_eq!(test_org.dna[2].len(), 495);
+
+                //Verify that each element of the dna is within the domain.
+                for (c, dna) in test_org.dna.iter().enumerate() {
+                        match c {
+                                0 => {
+                                        for x in dna.iter() {
+                                                assert!(x.abs() <= SECOND_DOMAIN);
+                                        }
+                                },
+                                1 => {
+                                        for x in dna.iter() {
+                                                assert!(x.abs() <= THIRD_DOMAIN);
+                                        }
+                                },
+                                2 => {
+                                        for x in dna.iter() {
+                                                assert!(x.abs() <= FOURTH_DOMAIN);
+                                        }
+                                },
+                                _ => {
+                                        assert!(false);
+                                },
+                        }
+                }                
+        }
 
 }
