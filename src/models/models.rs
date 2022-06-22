@@ -3,6 +3,7 @@ use rand_distr::{Normal, Distribution};
 use rand::seq::SliceRandom;
 use std::option::Option;
 use uuid::Uuid;
+use std::any::Any;      
 
 #[allow(dead_code)] // The DNA Size will always be positive (non-negative) and therefore is u32.
 const DNA_SIZE: u32 = 5;
@@ -35,11 +36,14 @@ pub trait Organism {
         fn get_fitness(&self) -> f64;
         fn evaluate_fitness(&mut self, target: Vec<f64>);
         fn mutate(&mut self);
+        fn as_any(&self) -> &dyn Any;
 }
 
 pub trait Population: Sized  {
         fn natural_selection(&mut self);
-        // fn quadratic_mating(&mut self);
+        // We use Box to allow for different types of organisms. It does mean
+        // that we need to implement As Any for the organism.
+        fn quadratic_mating(&mut self) -> Box<dyn Organism>;
 }
 
 // Newtype wrapper for Simple Organism population.
@@ -56,11 +60,69 @@ impl Population for Vec<SimpleOrganism> {
                         for _ in 0..3 {
                                 parents.push(tournament_round(&new_pool.to_vec()));
                         }
-
+                        
                         // We push onto the original pool.
-                        self.push(quadratic_mating(&mut parents));
+                        let child = parents.quadratic_mating();
+                        // TODO: Really make sure this is the best way of doing it.
+                        let result: &SimpleOrganism = child.as_any().downcast_ref().unwrap();
+                        self.push(result.clone());
                 }
         }
+
+        fn quadratic_mating(&mut self) -> Box<dyn Organism> {
+                // There should always be three parents.
+                assert_eq!(self.len(), 3);
+                // We should initialize the child.
+                let mut child = SimpleOrganism{
+                        id: Uuid::new_v4().to_string(),
+                        // This makes push much less costly. We know the size of the DNA
+                        // is going to be the same.
+                        dna: Vec::with_capacity(DNA_SIZE.try_into().unwrap()),
+                        fitness: 0.0,
+                };
+
+                // We need to sort the vector by fitness.
+                self.sort_by(|a, b| a.fitness.partial_cmp(&b.fitness).unwrap());
+
+                // Now, we fit to a quadratic curve. The first parent is the most fit.
+                let (p1, p2, p3) = (&self[0], &self[1], &self[2]); 
+
+                // Now, we iterate over the DNA of the first parent.
+                for i in 0..p1.dna.len() {
+                        let a = (1.0 / (p3.dna[i] - p2.dna[i])) * (((p3.fitness - p1.fitness) / (p3.dna[i] - p1.dna[i])) - ((p2.fitness - p1.fitness) / (p2.dna[i] - p1.dna[i])));
+                        let b = ((p2.fitness - p1.fitness) / (p2.dna[i] - p1.dna[i])) - (a * (p2.dna[i] + p1.dna[i]));
+
+                        let critical_point: f64= b / (-2.0 * a);
+                        let concavity = 2.0*a; 
+
+                        // println!("{} {} {} {} {}", p1.dna[i], p2.dna[i], p3.dna[i], critical_point, concavity);
+
+                        // If the concavity is positive (minimized), then we should use the critical point.
+                        if concavity > 0.0 && (critical_point.abs() > DOMAIN_LOWER && critical_point.abs() < DOMAIN_UPPER) {
+                                child.dna.push(critical_point);
+                        } else {
+                                // Otherwise, we should use a linear interpolation.
+                                let result = linear_interpolation(p1.dna[i], p3.dna[i]);
+                                match result {
+                                        Some(x) => child.dna.push(x),
+                                        // If None, i.e., the linear interpolation failed, we randomly select one of the parents.
+                                        None => {
+                                                let rand_parent = self.choose(&mut rand::thread_rng()).unwrap();
+                                                child.dna.push(rand_parent.dna[i]);
+                                        },
+                                }
+                        }
+
+                }
+
+                // Evaluate the fitness of the child.
+                child.evaluate_fitness(TARGET_LIST.to_vec());
+                child.mutate();
+                let result = Box::new(child);
+                result
+        }
+
+
 }
 
 
@@ -124,6 +186,10 @@ impl Organism for SimpleOrganism {
 
         fn get_fitness(&self) -> f64 {
                 return self.fitness;
+        }
+
+        fn as_any(&self) -> &dyn Any {
+                self
         }
 }
 
@@ -215,57 +281,57 @@ fn make_tournament_group<T>(grp: &mut Vec<T>, pool: &Vec<T>) where T: Organism, 
 // TODO: This test can fail if the same organism is selected twice. We should fix this.
 
 
-pub fn quadratic_mating(parents: &mut Vec<SimpleOrganism>) -> SimpleOrganism {
-        // There should always be three parents.
-        assert_eq!(parents.len(), 3);
-        // We should initialize the child.
-        let mut child = SimpleOrganism{
-                id: Uuid::new_v4().to_string(),
-                // This makes push much less costly. We know the size of the DNA
-                // is going to be the same.
-                dna: Vec::with_capacity(DNA_SIZE.try_into().unwrap()),
-                fitness: 0.0,
-        };
+// pub fn quadratic_mating(parents: &mut Vec<SimpleOrganism>) -> SimpleOrganism {
+//         // There should always be three parents.
+//         assert_eq!(parents.len(), 3);
+//         // We should initialize the child.
+//         let mut child = SimpleOrganism{
+//                 id: Uuid::new_v4().to_string(),
+//                 // This makes push much less costly. We know the size of the DNA
+//                 // is going to be the same.
+//                 dna: Vec::with_capacity(DNA_SIZE.try_into().unwrap()),
+//                 fitness: 0.0,
+//         };
 
-        // We need to sort the vector by fitness.
-        parents.sort_by(|a, b| a.fitness.partial_cmp(&b.fitness).unwrap());
+//         // We need to sort the vector by fitness.
+//         parents.sort_by(|a, b| a.fitness.partial_cmp(&b.fitness).unwrap());
 
-        // Now, we fit to a quadratic curve. The first parent is the most fit.
-        let (p1, p2, p3) = (&parents[0], &parents[1], &parents[2]); 
+//         // Now, we fit to a quadratic curve. The first parent is the most fit.
+//         let (p1, p2, p3) = (&parents[0], &parents[1], &parents[2]); 
 
-        // Now, we iterate over the DNA of the first parent.
-        for i in 0..p1.dna.len() {
-                let a = (1.0 / (p3.dna[i] - p2.dna[i])) * (((p3.fitness - p1.fitness) / (p3.dna[i] - p1.dna[i])) - ((p2.fitness - p1.fitness) / (p2.dna[i] - p1.dna[i])));
-                let b = ((p2.fitness - p1.fitness) / (p2.dna[i] - p1.dna[i])) - (a * (p2.dna[i] + p1.dna[i]));
+//         // Now, we iterate over the DNA of the first parent.
+//         for i in 0..p1.dna.len() {
+//                 let a = (1.0 / (p3.dna[i] - p2.dna[i])) * (((p3.fitness - p1.fitness) / (p3.dna[i] - p1.dna[i])) - ((p2.fitness - p1.fitness) / (p2.dna[i] - p1.dna[i])));
+//                 let b = ((p2.fitness - p1.fitness) / (p2.dna[i] - p1.dna[i])) - (a * (p2.dna[i] + p1.dna[i]));
 
-                let critical_point: f64= b / (-2.0 * a);
-                let concavity = 2.0*a; 
+//                 let critical_point: f64= b / (-2.0 * a);
+//                 let concavity = 2.0*a; 
 
-                // println!("{} {} {} {} {}", p1.dna[i], p2.dna[i], p3.dna[i], critical_point, concavity);
+//                 // println!("{} {} {} {} {}", p1.dna[i], p2.dna[i], p3.dna[i], critical_point, concavity);
 
-                // If the concavity is positive (minimized), then we should use the critical point.
-                if concavity > 0.0 && (critical_point.abs() > DOMAIN_LOWER && critical_point.abs() < DOMAIN_UPPER) {
-                        child.dna.push(critical_point);
-                } else {
-                        // Otherwise, we should use a linear interpolation.
-                        let result = linear_interpolation(p1.dna[i], p3.dna[i]);
-                        match result {
-                                Some(x) => child.dna.push(x),
-                                // If None, i.e., the linear interpolation failed, we randomly select one of the parents.
-                                None => {
-                                        let rand_parent = parents.choose(&mut rand::thread_rng()).unwrap();
-                                        child.dna.push(rand_parent.dna[i]);
-                                },
-                        }
-                }
+//                 // If the concavity is positive (minimized), then we should use the critical point.
+//                 if concavity > 0.0 && (critical_point.abs() > DOMAIN_LOWER && critical_point.abs() < DOMAIN_UPPER) {
+//                         child.dna.push(critical_point);
+//                 } else {
+//                         // Otherwise, we should use a linear interpolation.
+//                         let result = linear_interpolation(p1.dna[i], p3.dna[i]);
+//                         match result {
+//                                 Some(x) => child.dna.push(x),
+//                                 // If None, i.e., the linear interpolation failed, we randomly select one of the parents.
+//                                 None => {
+//                                         let rand_parent = parents.choose(&mut rand::thread_rng()).unwrap();
+//                                         child.dna.push(rand_parent.dna[i]);
+//                                 },
+//                         }
+//                 }
 
-        }
+//         }
 
-        // Evaluate the fitness of the child.
-        child.evaluate_fitness(TARGET_LIST.to_vec());
-        child.mutate();
-        return child;
-}
+//         // Evaluate the fitness of the child.
+//         child.evaluate_fitness(TARGET_LIST.to_vec());
+//         child.mutate();
+//         return child;
+// }
 
 // We interpolate between the most fit and least fit organisms.
 pub fn linear_interpolation(best: f64, worst: f64) -> Option<f64> {
@@ -430,9 +496,10 @@ mod tests {
                         };
                         let mut parents = vec![p1, p2, p3];
 
-                        let child = quadratic_mating(&mut parents);
+                        let child = parents.quadratic_mating();
+                        let result = child.as_any().downcast_ref::<SimpleOrganism>().unwrap();
 
-                        println!("Quadratic fitting: {:?}", child);
+                        println!("Quadratic fitting: {:?}", result);
                 }
 
 }
