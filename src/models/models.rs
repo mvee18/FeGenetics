@@ -39,21 +39,38 @@ pub trait Organism {
 
 pub trait Population: Sized  {
         fn natural_selection(&mut self);
+        // fn quadratic_mating(&mut self);
 }
+
+// Newtype wrapper for Simple Organism population.
 
 impl Population for Vec<SimpleOrganism> {
         fn natural_selection(&mut self) {
-                unimplemented!()
+                // Copy the original pool so we don't use the new organisms in the mating.
+                let new_pool = self.clone();
+                // The number of iterations should be equal to the pool since we cut it in half.
+                // That is, we must refill the pool.
+                // TODO: Refill different fractions of the pool depending on the above function.
+                for _ in 0..new_pool.len() {
+                        let mut parents: Vec<SimpleOrganism> = Vec::new();
+                        for _ in 0..3 {
+                                parents.push(tournament_round(&new_pool.to_vec()));
+                        }
+
+                        // We push onto the original pool.
+                        self.push(quadratic_mating(&mut parents));
+                }
         }
 }
 
-impl Population for Vec<ForceOrganism> {
-        fn natural_selection(&mut self) {
-                unimplemented!()
-        }
-}
 
-#[derive(Debug)]
+// impl Population for Vec<ForceOrganism> {
+//         fn natural_selection(&mut self) {
+//                 organism_natural_selection(&mut self);
+//         }
+// }
+
+#[derive(Debug, Clone, PartialEq)]
 pub struct ForceOrganism {
         pub id: String,
         pub dna: Vec<Vec<Vec<f64>>>,
@@ -148,25 +165,36 @@ where T: Organism {
         pool.drain((pool.len() / 2)..pool.len());
 }
 
-pub fn natural_selection(pool: &mut Vec<SimpleOrganism>) {
-        // Copy the original pool so we don't use the new organisms in the mating.
-        let new_pool = pool.clone();
+// pub fn organism_natural_selection<T>(pool: &mut Vec<T>) where T: Organism, T: Clone {
+//         // Copy the original pool so we don't use the new organisms in the mating.
+//         let new_pool = pool.clone();
+//         // The number of iterations should be equal to the pool since we cut it in half.
+//         // That is, we must refill the pool.
+//         // TODO: Refill different fractions of the pool depending on the above function.
+//         for _ in 0..new_pool.len() {
+//                 let mut parents: Vec<T> = Vec::new();
+//                 for _ in 0..3 {
+//                         parents.push(tournament_round(&new_pool.to_vec()));
+//                 }
+
+//                 // We push onto the original pool.
+//                 pool.push(quadratic_mating(&mut parents));
+//         }
+// }
+
+pub fn tournament_round<T>(pool: &Vec<T>) -> T where T: Organism, T: Clone {
         // The number of iterations should be equal to the pool since we cut it in half.
         // That is, we must refill the pool.
-        // TODO: Refill different fractions of the pool depending on the above function.
-        for _ in 0..new_pool.len() {
-                let mut parents: Vec<SimpleOrganism> = Vec::new();
-                for _ in 0..3 {
-                        parents.push(tournament_round(&new_pool.to_vec()));
-                }
-
-                // We push onto the original pool.
-                pool.push(quadratic_mating(&mut parents));
-        }
+        let mut group: Vec<T> = Vec::new();
+        make_tournament_group(&mut group, pool);
+        // Sort the group by fitness.
+        group.sort_by(|a, b| a.get_fitness().partial_cmp(&b.get_fitness()).unwrap());
+        // Return the most fit organism.
+        group[0].clone()
 }
 
 // Separate functionality for testing.
-fn make_tournament_group(grp: &mut Vec<SimpleOrganism>, pool: &Vec<SimpleOrganism>) {
+fn make_tournament_group<T>(grp: &mut Vec<T>, pool: &Vec<T>) where T: Organism, T: Clone {
         // Each group will have TOURNAMENT_SIZE members.
         // We don't want a duplicate organism. We will generate a sequence from 0 to the pool size.
         // Then, we will shuffle the sequence and take the first TOURNAMENT_SIZE elements.
@@ -185,16 +213,7 @@ fn make_tournament_group(grp: &mut Vec<SimpleOrganism>, pool: &Vec<SimpleOrganis
 }
 
 // TODO: This test can fail if the same organism is selected twice. We should fix this.
-pub fn tournament_round(pool: &Vec<SimpleOrganism>) -> SimpleOrganism {
-        // The number of iterations should be equal to the pool since we cut it in half.
-        // That is, we must refill the pool.
-        let mut group: Vec<SimpleOrganism> = Vec::new();
-        make_tournament_group(&mut group, pool);
-        // Sort the group by fitness.
-        group.sort_by(|a, b| a.fitness.partial_cmp(&b.fitness).unwrap());
-        // Return the most fit organism.
-        group[0].clone()
-}
+
 
 pub fn quadratic_mating(parents: &mut Vec<SimpleOrganism>) -> SimpleOrganism {
         // There should always be three parents.

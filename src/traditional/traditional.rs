@@ -1,4 +1,4 @@
-use crate::models::models::{eliminate_unfit_fraction, natural_selection, POPULATION_SIZE, FITNESS_THRESHOLD, SimpleOrganism, Organism, Population};
+use crate::models::models::{eliminate_unfit_fraction, POPULATION_SIZE, FITNESS_THRESHOLD, SimpleOrganism, Organism, Population};
 use std::{time::Instant};
 
 
@@ -33,7 +33,7 @@ pub fn run_tga() {
 
                 // Perform natural selection on the remaining population. 
                 // Replace the old population with the new one.
-                natural_selection(&mut population);
+                population.natural_selection();
                 generation += 1;
         }
 }
