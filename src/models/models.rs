@@ -6,6 +6,9 @@ use uuid::Uuid;
 use std::any::Any;      
 use strum::IntoEnumIterator;
 use crate::utils::domain::{Derivatives, determine_number_force_constants, SECOND_DOMAIN, THIRD_DOMAIN, FOURTH_DOMAIN};
+use std::path::Path;
+use std::fs::{File, create_dir};
+use std::io::Write;
 
 #[allow(dead_code)] // The DNA Size will always be positive (non-negative) and therefore is u32.
 const DNA_SIZE: u32 = 5;
@@ -22,6 +25,7 @@ const MUTATION_RATE: f64 = 0.01;
 pub const POPULATION_SIZE: i32 = 100;
 pub const FITNESS_THRESHOLD: f64 = 1e-5;
 pub const NUMBER_ATOMS: i32 = 3;
+pub const FORT_FILES: [&'static str; 3] = ["fort.15", "fort.30", "fort.40"];
 
 // The Organism is a trait (interface).
 pub trait Organism {
@@ -39,6 +43,7 @@ pub trait Organism {
         fn get_fitness(&self) -> f64;
         fn evaluate_fitness(&mut self, target: Vec<f64>);
         fn mutate(&mut self);
+        fn save_to_file(&self);
         fn as_any(&self) -> &dyn Any;
 }
 
@@ -151,10 +156,8 @@ pub struct SimpleOrganism {
 
 impl Organism for SimpleOrganism {
         fn new(dna_size: i32) -> SimpleOrganism {
-                let id = Uuid::new_v4().to_string();
-
                 let mut o = SimpleOrganism {
-                        id: id,
+                        id: Uuid::new_v4().to_string(),
                         dna: Vec::new(),
                         fitness: 0.0,
                 };
@@ -194,15 +197,17 @@ impl Organism for SimpleOrganism {
         fn as_any(&self) -> &dyn Any {
                 self
         }
+
+        fn save_to_file(&self) {
+            unimplemented!("Will not be implemented for this organism type as it does not need to be saved to a file.")
+        }
 }
 
 impl Organism for ForceOrganism {
         // Here, size is the number of atoms.
         fn new(n_atoms: i32) -> Self where Self: Sized {
-                let id = Uuid::new_v4().to_string();
-
                 let mut o = ForceOrganism {
-                        id: id,
+                        id: Uuid::new_v4().to_string(), 
                         dna: Vec::with_capacity(3),
                         fitness: 0.0,
                 };
@@ -219,6 +224,8 @@ impl Organism for ForceOrganism {
 
                         o.dna.push(chromosome);
                 }
+
+                o.save_to_file();
 
                 return o;
         }
@@ -237,6 +244,39 @@ impl Organism for ForceOrganism {
 
         fn as_any(&self) -> &dyn Any {
                 self
+        }
+
+        fn save_to_file(&self) {
+                // Make organisms directory if it doesn't exist.
+                let organisms_dir = Path::new("./organisms");
+                if !organisms_dir.exists() {
+                        create_dir(organisms_dir).expect("Could not create organisms directory.");
+                }
+
+                println!("Absolute path: {}", organisms_dir.display());
+
+                // Make each organism's subdirectory. Should be unique due to UUID.
+                let organism_dir = organisms_dir.join(self.id.clone());
+                if !organism_dir.exists() {
+                        create_dir(organism_dir.clone()).expect("Could not create organism directory.");
+                } else {
+                        panic!("Organism directory already exists.");
+                }
+
+                // Make three separate files for each chromosome.
+                for i in 0..self.dna.len() {
+                        let mut file = File::create(organism_dir.join(format!("{}", FORT_FILES[i]))).expect("Could not create file.");
+                        let header = format!("{:>5}{:>5}", NUMBER_ATOMS, self.dna[i].len());
+                        file.write(header.as_bytes()).expect("Could not write to file.");
+                        for j in 0..self.dna[i].len() {
+                                if j % 3 == 0 {
+                                        file.write("\n".as_bytes()).expect("Could not write to file.");
+                                }
+                                let line = format!("{:>20.10}", self.dna[i][j]);
+                                file.write_all(line.as_bytes()).expect("Could not write to file.");
+                        }
+                }
+
         }
 }
 
@@ -487,6 +527,15 @@ mod tests {
                                 },
                         }
                 }                
+        }
+
+        #[test]
+        fn test_save_force() {
+                let test_org = ForceOrganism::new(3);
+
+                test_org.save_to_file()
+
+
         }
 
 }
