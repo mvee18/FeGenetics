@@ -20,24 +20,37 @@ pub const POPULATION_SIZE: i32 = 100;
 pub const FITNESS_THRESHOLD: f64 = 1e-5;
 
 // The Organism is a trait (interface).
-pub trait Organism: Sized {
-        fn new(size: i32) -> Self;
-        fn new_population(size: i32) -> Vec<Self> {
-                let mut population = Vec::new();
-                for _ in 0..size {
-                        let mut organism = Self::new(size);
+pub trait Organism {
+        fn new(size: i32) -> Self where Self: Sized;
+        fn new_population(pop_size: i32) -> Vec<Self> 
+        where Self: Sized {
+                let mut population: Vec<Self> = Vec::new();
+                for _ in 0..pop_size {
+                        let mut organism = Self::new(DNA_SIZE.try_into().unwrap());
                         organism.evaluate_fitness(TARGET_LIST.to_vec());
                         population.push(organism);
                 }
                 population    
         }
+        fn get_fitness(&self) -> f64;
         fn evaluate_fitness(&mut self, target: Vec<f64>);
         fn mutate(&mut self);
 }
 
-pub trait Populations {
-        fn eliminate_unfit_fractions(&mut self);
+pub trait Population: Sized  {
         fn natural_selection(&mut self);
+}
+
+impl Population for Vec<SimpleOrganism> {
+        fn natural_selection(&mut self) {
+                unimplemented!()
+        }
+}
+
+impl Population for Vec<ForceOrganism> {
+        fn natural_selection(&mut self) {
+                unimplemented!()
+        }
 }
 
 #[derive(Debug)]
@@ -91,35 +104,47 @@ impl Organism for SimpleOrganism {
                         }
                 }
         }
+
+        fn get_fitness(&self) -> f64 {
+                return self.fitness;
+        }
 }
 
 
 // Make the pool of organisms.
 // TODO: Later, this should use the enum to make the pool of organisms.
-pub fn create_organism_pool(size: i32) -> Vec<SimpleOrganism> {
-        // Initialize the empty pool.
-        let mut pool: Vec<SimpleOrganism> = Vec::new();
-        // Create the organisms up to the size.
-        for _ in 0..size {
-                let mut o = SimpleOrganism::new(DNA_SIZE.try_into().unwrap());
-                o.evaluate_fitness(TARGET_LIST.to_vec());
-                pool.push(o);
-        }
-        pool
-}
+// pub fn create_organism_pool(size: i32) -> Vec<SimpleOrganism> {
+//         // Initialize the empty pool.
+//         let mut pool: Vec<SimpleOrganism> = Vec::new();
+//         // Create the organisms up to the size.
+//         for _ in 0..size {
+//                 let mut o = SimpleOrganism::new(DNA_SIZE.try_into().unwrap());
+//                 o.evaluate_fitness(TARGET_LIST.to_vec());
+//                 pool.push(o);
+//         }
+//         pool
+// }
 
 fn difference_squared(a: f64, b: f64) -> f64 {
         let diff = a - b;
         diff * diff
 }
 
-pub fn eliminate_unfit_fractions(pool: &mut Vec<SimpleOrganism>) {
-        // Ensure the pool is an even number.
-        assert_eq!(pool.len() % 2, 0);
-        // Sort the pool by fitness.__rust_force_expr!
-        pool.sort_by(|a, b| a.fitness.partial_cmp(&b.fitness).unwrap());
-        // Remove the top half of the pool (i.e., the least fit).
-        // TODO: Make this eliminate different fractions of the pool.
+// pub fn eliminate_unfit_fraction(pool: &mut Vec<SimpleOrganism>) {
+//         // Ensure the pool is an even number.
+//         assert_eq!(pool.len() % 2, 0);
+//         // Sort the pool by fitness.__rust_force_expr!
+//         pool.sort_by(|a, b| a.fitness.partial_cmp(&b.fitness).unwrap());
+//         // Remove the top half of the pool (i.e., the least fit).
+//         // TODO: Make this eliminate different fractions of the pool.
+//         pool.drain((pool.len() / 2)..pool.len());
+// }
+
+pub fn eliminate_unfit_fraction<T>(pool: &mut Vec<T>) 
+where T: Organism {
+        // Sort the population by fitness.
+        pool.sort_by(|a, b| a.get_fitness().partial_cmp(&b.get_fitness()).unwrap());
+
         pool.drain((pool.len() / 2)..pool.len());
 }
 
@@ -280,7 +305,9 @@ mod tests {
 
                 // println!("Wanted fitness: 5.0, got fitness: {}", test_org.fitness);
 
-                assert_eq!(test_org.fitness, 5.0);
+                let wanted = 1.6666667;
+
+                assert!((test_org.fitness - wanted).abs() < 0.00001);
         }
         #[test]
         fn test_create_organism() {
@@ -300,7 +327,7 @@ mod tests {
         fn test_elimination() {
                 let mut pool: Vec<SimpleOrganism> = generate_test_organism();
 
-                eliminate_unfit_fractions(&mut pool);
+                eliminate_unfit_fraction(&mut pool);
 
                 assert_eq!(pool[0].fitness, 1.0);
                 assert_eq!(pool[1].fitness, 2.0);
@@ -388,7 +415,5 @@ mod tests {
 
                         println!("Quadratic fitting: {:?}", child);
                 }
-
-
 
 }
