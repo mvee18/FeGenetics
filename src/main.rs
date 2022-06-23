@@ -1,7 +1,7 @@
-mod utils;
 mod models;
-mod traditional;
 mod programs;
+mod traditional;
+mod utils;
 use traditional::traditional::run_tga;
 
 fn main() {
