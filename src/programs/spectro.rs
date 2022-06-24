@@ -1,4 +1,3 @@
-use std::io::Write;
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
 
@@ -7,9 +6,16 @@ const SPECTRO_IN_PATH: &str = "src/input/spectro.in";
 
 pub fn run_spectro(organism_id: String) -> String {
     // Organism path is organisms/<organism_id>.
-    let organism_path = PathBuf::from(format!("organisms/{}", organism_id))
-        .canonicalize()
-        .unwrap();
+    let organism_path: PathBuf;
+    if organism_id == "test_organism" {
+        organism_path = PathBuf::from("src/input/test_organism")
+            .canonicalize()
+            .unwrap();
+    } else {
+        organism_path = PathBuf::from(format!("organisms/{}", organism_id))
+            .canonicalize()
+            .unwrap();
+    }
 
     // Get absolute path to SPECTRO_PATH.
     let spectro_path = PathBuf::from(SPECTRO_PATH).canonicalize().unwrap();
@@ -19,6 +25,8 @@ pub fn run_spectro(organism_id: String) -> String {
 
     // Get current working directory.
     let cwd = std::env::current_dir().unwrap();
+
+    println!("cwd: {:?}\n\n", cwd);
 
     // Change working directory to the organism path.
     std::env::set_current_dir(&organism_path).unwrap();
@@ -40,13 +48,12 @@ pub fn run_spectro(organism_id: String) -> String {
         .unwrap();
 
     let output = command.wait_with_output().unwrap();
+    std::env::set_current_dir(&cwd).unwrap();
 
     if output.status.success() {
         // Change working directory back to the original working directory.
-        std::env::set_current_dir(&cwd).unwrap();
         return String::from_utf8_lossy(&output.stdout).to_string();
     } else {
-        std::env::set_current_dir(&cwd).unwrap();
         panic!("Error running spectro in {}", organism_path.display());
     }
 }
@@ -58,6 +65,7 @@ mod tests {
     #[test]
     fn test_run_spectro() {
         let organism_id = "test_organism";
-        run_spectro(organism_id.to_string());
+        let result = run_spectro(organism_id.to_string());
+        // println!("{}", result);
     }
 }
