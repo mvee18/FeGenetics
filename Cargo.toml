@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 rand = "0.8.5"
 rand_distr = "0.4.3"
+regex = "1.5.6"
 strum = "0.24.1"
 strum_macros = "0.24.0"
 tempdir = "0.3.7"

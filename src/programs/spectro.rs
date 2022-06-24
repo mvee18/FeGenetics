@@ -67,6 +67,34 @@ pub fn run_spectro(organism_id: String) -> String {
     rx.recv().unwrap()
 }
 
+pub fn parse_spectro(output: String) -> Vec<String> {
+    use regex::Regex;
+
+    let lines = output.lines();
+    // Regex that matches LXM MATRIX.
+    let mut found = false;
+    let re = Regex::new(r"LXM MATRIX").unwrap();
+    let end_re = Regex::new(r"\s+-{10,}").unwrap();
+
+    let mut result: Vec<String> = vec![String::from("")];
+
+    for line in lines {
+        if re.is_match(line) {
+            found = true;
+        }
+
+        if found {
+            if end_re.is_match(line) {
+                found = false;
+            } else {
+                result.push(line.to_string());
+            }
+        }
+    }
+
+    result
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -75,6 +103,6 @@ mod tests {
     fn test_run_spectro() {
         let organism_id = "test_organism";
         let result = run_spectro(organism_id.to_string());
-        // println!("{}", result);
+        println!("{:?}", parse_spectro(result));
     }
 }
