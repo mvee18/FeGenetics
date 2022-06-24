@@ -29,7 +29,6 @@ pub const POPULATION_SIZE: i32 = 100;
 pub const FITNESS_THRESHOLD: f64 = 1e-5;
 pub const NUMBER_ATOMS: i32 = 3;
 pub const FORT_FILES: [&'static str; 3] = ["fort.15", "fort.30", "fort.40"];
-pub const ORGANISM_DIRECTORY_PATH: &'static str = ".";
 
 // The Organism is a trait (interface).
 pub trait Organism {
@@ -237,7 +236,8 @@ impl Organism for ForceOrganism {
             o.dna.push(chromosome);
         }
 
-        o.save_to_file(ORGANISM_DIRECTORY_PATH);
+        let project_root = env!("CARGO_MANIFEST_DIR");
+        o.save_to_file(project_root);
 
         return o;
     }
@@ -1319,23 +1319,28 @@ mod tests {
     #[test]
     fn test_save_force() {
         // Check if ./organisms/water_test exists. If so, delete it.
-        if Path::new("./organisms/water_test").exists() {
-            fs::remove_dir_all("./organisms/water_test").unwrap();
+        // Path to cargo.toml
+        let cargo_toml_path = Path::new(env!("CARGO_MANIFEST_DIR"));
+        let organism_path = cargo_toml_path.join("organisms").join("water_test");
+        if organism_path.exists() {
+            fs::remove_dir_all(&organism_path).unwrap();
         }
 
-        let path: &str = ".";
         let o = generate_water_organism();
 
-        o.save_to_file(path);
+        o.save_to_file(cargo_toml_path.to_str().unwrap());
 
         // Read the file back in and compare the contents.
-        let fort15 = fs::read_to_string("./organisms/water_test/fort.15").unwrap();
-        let fort30 = fs::read_to_string("./organisms/water_test/fort.30").unwrap();
-        let fort40 = fs::read_to_string("./organisms/water_test/fort.40").unwrap();
+        let fort15 = fs::read_to_string(organism_path.join("fort.15")).unwrap();
+        let fort30 = fs::read_to_string(organism_path.join("fort.30")).unwrap();
+        let fort40 = fs::read_to_string(organism_path.join("fort.40")).unwrap();
 
-        let fort15_test = fs::read_to_string("./tests/water_test/fort.15").unwrap();
-        let fort30_test = fs::read_to_string("./tests/water_test/fort.30").unwrap();
-        let fort40_test = fs::read_to_string("./tests/water_test/fort.40").unwrap();
+        let test_file_dir = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("tests")
+            .join("water_test");
+        let fort15_test = fs::read_to_string(test_file_dir.join("fort.15")).unwrap();
+        let fort30_test = fs::read_to_string(test_file_dir.join("fort.30")).unwrap();
+        let fort40_test = fs::read_to_string(test_file_dir.join("fort.40")).unwrap();
 
         assert_eq!(fort15, fort15_test);
         assert_eq!(fort30, fort30_test);
