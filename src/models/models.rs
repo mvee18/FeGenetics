@@ -361,7 +361,7 @@ impl Organism for ForceOrganism {
             Ok(freqs) => {
                 // println!("The test freqs are {:?}\n", organism_freqs);
 
-                for (c, freq) in freqs.harm.iter().enumerate() {
+                for (c, freq) in freqs.lxm_freqs.iter().enumerate() {
                     fitness +=
                         difference_squared(*freq, target.harm[c]) / (target.harm.len() as f64);
                 }
@@ -1292,15 +1292,14 @@ mod tests {
     fn test_evalute_fitness() {
         let mut test_org = SimpleOrganism {
             id: "testOrg".to_string(),
-            dna: vec![3943.0, 3833.0, 1651.0],
+            dna: vec![3943.0, 3833.0, 1651.0, 0.02, 0.0, 0.0, 0.0, 0.0, 0.0],
             fitness: 0.0,
         };
 
         test_org.evaluate_fitness(TARGET);
 
-        // println!("Wanted fitness: 5.0, got fitness: {}", test_org.fitness);
-
-        let wanted = 0.680307;
+        let wanted = 0.226769;
+        println!("got fitness: {}", test_org.fitness);
 
         assert!((test_org.fitness - wanted).abs() < 0.00001);
     }
@@ -1391,17 +1390,18 @@ mod tests {
     fn test_quadratic_mating_case_one() {
         let p1: SimpleOrganism = SimpleOrganism {
             id: "1".to_string(),
-            dna: vec![-1.0, -1.0, -1.0],
+            dna: vec![-1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0],
             fitness: 1.0,
         };
         let p2: SimpleOrganism = SimpleOrganism {
             id: "2".to_string(),
-            dna: vec![0.0, 0.0, 0.0],
+            dna: vec![0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+
             fitness: 0.0,
         };
         let p3: SimpleOrganism = SimpleOrganism {
             id: "3".to_string(),
-            dna: vec![1.0, 1.0, 1.0],
+            dna: vec![1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
             fitness: 1.0,
         };
         let mut parents = vec![p1, p2, p3];
@@ -1487,7 +1487,6 @@ mod tests {
     fn test_water_evaluate() {
         let mut o = generate_water_organism();
         o.evaluate_fitness(TARGET);
-
-        assert_eq!(o.fitness, 0.0);
+        assert!(o.fitness - 2.333333e-06 < 0.000001);
     }
 }
