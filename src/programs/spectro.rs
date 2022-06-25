@@ -4,8 +4,8 @@ use std::sync::mpsc;
 use std::thread;
 use summarize::Summary;
 
-const SPECTRO_PATH: &str = "src/input/spectro";
-const SPECTRO_IN_PATH: &str = "src/input/spectro.in";
+const SPECTRO_PATH: &str = "/home/mvee/rust/fegenetics/src/input/spectro";
+const SPECTRO_IN_PATH: &str = "/home/mvee/rust/fegenetics/src/input/spectro.in";
 
 pub fn run_spectro(organism_id: String) -> Summary {
     let (tx, rx) = mpsc::channel();
@@ -14,13 +14,16 @@ pub fn run_spectro(organism_id: String) -> Summary {
         // Organism path is organisms/<organism_id>.
         let organism_path: PathBuf;
         if organism_id == "test_organism" {
-            organism_path = PathBuf::from("src/input/test_organism")
+            organism_path = PathBuf::from("/home/mvee/rust/fegenetics/src/input/test_organism")
                 .canonicalize()
                 .unwrap();
         } else {
-            organism_path = PathBuf::from(format!("organisms/{}", organism_id))
-                .canonicalize()
-                .unwrap();
+            organism_path = PathBuf::from(format!(
+                "/home/mvee/rust/fegenetics/organisms/{}",
+                organism_id
+            ))
+            .canonicalize()
+            .unwrap();
         }
 
         // Get absolute path to SPECTRO_PATH.

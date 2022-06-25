@@ -1,3 +1,4 @@
+use crate::programs::spectro::run_spectro;
 use crate::utils::domain::{
     determine_number_force_constants, Derivatives, FOURTH_DOMAIN, SECOND_DOMAIN, THIRD_DOMAIN,
 };
@@ -34,6 +35,9 @@ pub const FORT_FILES: [&'static str; 3] = ["fort.15", "fort.30", "fort.40"];
 lazy_static! {
     #[derive(Clone, Copy)]
     pub static ref TARGET: Target = Target::initialize(&PathBuf::from("/home/mvee/rust/fegenetics/src/input/target.toml"));
+    // This is for the simple organisms.
+    // #[derive(Clone, Copy)]
+    // pub static ref TARGET: Target = Target::initialize(&PathBuf::from("/home/mvee/rust/fegenetics/tests/simple/target.toml"));
 }
 
 // The Organism is a trait (interface).
@@ -148,11 +152,89 @@ impl Population for Vec<SimpleOrganism> {
     }
 }
 
-// impl Population for Vec<ForceOrganism> {
-//         fn natural_selection(&mut self) {
-//                 organism_natural_selection(&mut self);
-//         }
-// }
+impl Population for Vec<ForceOrganism> {
+    fn natural_selection(&mut self) {
+        // Copy the original pool so we don't use the new organisms in the mating.
+        let new_pool = self.clone();
+        // The number of iterations should be equal to the pool since we cut it in half.
+        // That is, we must refill the pool.
+        // TODO: Refill different fractions of the pool depending on the above function.
+        for _ in 0..new_pool.len() {
+            let mut parents: Vec<ForceOrganism> = Vec::new();
+            for _ in 0..3 {
+                parents.push(tournament_round(&new_pool.to_vec()));
+            }
+
+            // We push onto the original pool.
+            let child = parents.quadratic_mating();
+            // TODO: Really make sure this is the best way of doing it.
+            let result: &ForceOrganism = child.as_any().downcast_ref().unwrap();
+            self.push(result.clone());
+        }
+    }
+
+    fn quadratic_mating(&mut self) -> Box<dyn Organism> {
+        // There should always be three parents.
+        assert_eq!(self.len(), 3);
+        // We should initialize the child.
+        let mut child = ForceOrganism {
+            id: Uuid::new_v4().to_string(),
+            // This makes push much less costly. We know the size of the DNA
+            // is going to be the same as the parent.
+            // Here, dna[0] is second derivatives, [1] is the third, and [2] is the fourth.
+            dna: vec![
+                Vec::with_capacity(self[0].dna[0].len()),
+                Vec::with_capacity(self[0].dna[1].len()),
+                Vec::with_capacity(self[0].dna[2].len()),
+            ],
+            fitness: 0.0,
+        };
+
+        // We need to sort the vector by fitness.
+        self.sort_by(|a, b| a.fitness.partial_cmp(&b.fitness).unwrap());
+
+        // Now, we fit to a quadratic curve. The first parent is the most fit.
+        let (p1, p2, p3) = (&self[0], &self[1], &self[2]);
+
+        // Now, we iterate over the DNA of the first parent.
+        for i in 0..p1.dna.len() {
+            for j in 0..p1.dna[i].len() {
+                let a = (1.0 / (p3.dna[i][j] - p2.dna[i][j]))
+                    * (((p3.fitness - p1.fitness) / (p3.dna[i][j] - p1.dna[i][j]))
+                        - ((p2.fitness - p1.fitness) / (p2.dna[i][j] - p1.dna[i][j])));
+                let b = ((p2.fitness - p1.fitness) / (p2.dna[i][j] - p1.dna[i][j]))
+                    - (a * (p2.dna[i][j] + p1.dna[i][j]));
+
+                let critical_point: f64 = b / (-2.0 * a);
+                let concavity = 2.0 * a;
+
+                // println!("{} {} {} {} {}", p1.dna[i], p2.dna[i], p3.dna[i], critical_point, concavity);
+
+                // If the concavity is positive (minimized), then we should use the critical point.
+                if concavity > 0.0
+                    && (critical_point.abs() > DOMAIN_LOWER && critical_point.abs() < DOMAIN_UPPER)
+                {
+                    child.dna[i].push(critical_point);
+                } else {
+                    // Otherwise, we should use a linear interpolation.
+                    let result = linear_interpolation(p1.dna[i][j], p3.dna[i][j]);
+                    match result {
+                        Some(x) => child.dna[i].push(x),
+                        // If None, i.e., the linear interpolation failed, we randomly select one of the parents.
+                        None => {
+                            let rand_parent = self.choose(&mut rand::thread_rng()).unwrap();
+                            child.dna[i].push(rand_parent.dna[i][j]);
+                        }
+                    }
+                }
+            }
+        }
+        child.evaluate_fitness(TARGET);
+        child.mutate();
+        let result = Box::new(child);
+        result
+    }
+}
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct ForceOrganism {
@@ -253,11 +335,35 @@ impl Organism for ForceOrganism {
     }
 
     fn evaluate_fitness(&mut self, target: TARGET) {
-        unimplemented!()
+        let mut fitness = 0.0;
+        let organism_freqs = run_spectro(self.id.clone());
+
+        // println!("The test freqs are {:?}\n", organism_freqs);
+
+        for (c, freq) in organism_freqs.harm.iter().enumerate() {
+            fitness += difference_squared(*freq, target.harm[c]);
+        }
+
+        for (c, rot) in organism_freqs.rots[0].iter().enumerate() {
+            fitness += difference_squared(*rot, target.rots[c]);
+        }
+
+        for (c, freq) in organism_freqs.fund.iter().enumerate() {
+            fitness += difference_squared(*freq, target.fund[c]);
+        }
+
+        self.fitness = fitness;
     }
 
     fn mutate(&mut self) {
-        unimplemented!()
+        for chromosome in self.dna.iter_mut() {
+            for gene in chromosome.iter_mut() {
+                if random_float(0.0, 1.0) < MUTATION_RATE {
+                    let norm_distr = Normal::new(*gene, 0.1).unwrap();
+                    *gene = norm_distr.sample(&mut rand::thread_rng());
+                }
+            }
+        }
     }
 
     fn as_any(&self) -> &dyn Any {
@@ -1350,5 +1456,13 @@ mod tests {
         assert_eq!(fort15, fort15_test);
         assert_eq!(fort30, fort30_test);
         assert_eq!(fort40, fort40_test);
+    }
+
+    #[test]
+    fn test_water_evaluate() {
+        let mut o = generate_water_organism();
+        o.evaluate_fitness(TARGET);
+
+        assert_eq!(o.fitness, 0.0);
     }
 }
