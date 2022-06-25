@@ -1,3 +1,4 @@
+use std::error::Error;
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
 use std::sync::mpsc;
@@ -7,7 +8,7 @@ use summarize::Summary;
 const SPECTRO_PATH: &str = "/home/mvee/rust/fegenetics/src/input/spectro";
 const SPECTRO_IN_PATH: &str = "/home/mvee/rust/fegenetics/src/input/spectro.in";
 
-pub fn run_spectro(organism_id: String) -> Summary {
+pub fn run_spectro(organism_id: String) -> Result<Summary, Box<dyn Error>> {
     let (tx, rx) = mpsc::channel();
 
     thread::spawn(move || {
@@ -17,7 +18,12 @@ pub fn run_spectro(organism_id: String) -> Summary {
             organism_path = PathBuf::from("/home/mvee/rust/fegenetics/src/input/test_organism")
                 .canonicalize()
                 .unwrap();
+        } else if organism_id == "bad_organism" {
+            organism_path = PathBuf::from("/home/mvee/rust/fegenetics/tests/bad_organism")
+                .canonicalize()
+                .unwrap();
         } else {
+            // println!("Trying organism {}", organism_id);
             organism_path = PathBuf::from(format!(
                 "/home/mvee/rust/fegenetics/organisms/{}",
                 organism_id
@@ -35,7 +41,7 @@ pub fn run_spectro(organism_id: String) -> Summary {
         // Get current working directory.
         let cwd = std::env::current_dir().unwrap();
 
-        println!("cwd: {:?}\n\n", cwd);
+        // println!("cwd: {:?}\n\n", cwd);
 
         // Change working directory to the organism path.
         std::env::set_current_dir(&organism_path).unwrap();
@@ -43,11 +49,11 @@ pub fn run_spectro(organism_id: String) -> Summary {
         // let file_contents = std::fs::read_to_string(spectro_in_path).unwrap();
         let input_file = std::fs::File::open(spectro_in_path).unwrap();
 
-        println!(
-            "The file paths are as follows: {} {}",
-            spectro_path.display(),
-            organism_path.display()
-        );
+        // println!(
+        //     "The file paths are as follows: {} {}",
+        //     spectro_path.display(),
+        //     organism_path.display()
+        // );
 
         // Run spectro from spectro path and pipe in the input file.
         let command = Command::new(&spectro_path)
@@ -68,10 +74,11 @@ pub fn run_spectro(organism_id: String) -> Summary {
     });
 
     // Unwrap the output from the channel. Then, parse the output.
-    parse_spectro(rx.recv().unwrap().to_vec())
+    let res = parse_spectro(rx.recv().unwrap().to_vec());
+    res
 }
 
-pub fn parse_spectro(output: Vec<u8>) -> Summary {
+pub fn parse_spectro(output: Vec<u8>) -> Result<Summary, Box<dyn std::error::Error>> {
     let result = summarize::Summary::new(output);
     result
 }
@@ -83,7 +90,7 @@ mod tests {
     #[test]
     fn test_run_spectro() {
         let organism_id = "test_organism";
-        let result = run_spectro(organism_id.to_string());
+        let result = run_spectro(organism_id.to_string()).unwrap();
         println!("{:?}", result);
 
         let expected_harm = vec![3943.976, 3833.989, 1651.332];
@@ -93,5 +100,12 @@ mod tests {
         assert_eq!(result.harm, expected_harm);
         assert_eq!(result.fund, expected_fund);
         assert_eq!(result.rots[0], expected_rots);
+    }
+
+    #[test]
+    fn test_bad_organism() {
+        let organism_id = "bad_organism";
+        let result = run_spectro(organism_id.to_string());
+        assert!(result.is_err());
     }
 }

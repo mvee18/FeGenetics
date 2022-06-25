@@ -1,6 +1,5 @@
 use crate::models::models::{
-    eliminate_unfit_fraction, ForceOrganism, Organism, Population, SimpleOrganism,
-    FITNESS_THRESHOLD, POPULATION_SIZE,
+    ForceOrganism, Organism, Population, FITNESS_THRESHOLD, POPULATION_SIZE,
 };
 use std::time::Instant;
 
@@ -38,13 +37,16 @@ pub fn run_tga() {
 
         if generation % 100 == 0 {
             println!(
-                "Generation {}: The best organism's fitness is {}.",
-                generation, best_organism.fitness
+                "Time taken: {:?} | Generation {} | Fitness {} | Best Organism {}",
+                Instant::now().duration_since(start_time),
+                generation,
+                best_organism.fitness,
+                best_organism.id
             );
         }
 
         // Otherwise, we eliminiate the worst half of the population.
-        eliminate_unfit_fraction(&mut population);
+        population.eliminate_unfit_fraction();
 
         // Perform natural selection on the remaining population.
         // Replace the old population with the new one.

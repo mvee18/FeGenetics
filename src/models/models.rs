@@ -1,18 +1,15 @@
 use crate::programs::spectro::run_spectro;
-use crate::utils::domain::{
-    determine_number_force_constants, Derivatives, FOURTH_DOMAIN, SECOND_DOMAIN, THIRD_DOMAIN,
-};
+use crate::utils::domain::{determine_number_force_constants, Derivatives};
 use crate::utils::domain::{random_float, random_float_mc};
 use crate::utils::utils::{create_directory, Target};
 use lazy_static::lazy_static;
 use rand::seq::SliceRandom;
 use rand_distr::{Distribution, Normal};
 use std::any::Any;
-use std::fs;
 use std::fs::File;
 use std::io::Write;
 use std::option::Option;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use strum::IntoEnumIterator;
 use uuid::Uuid;
 
@@ -24,11 +21,11 @@ const DOMAIN_LOWER: f64 = 0.0;
 const DOMAIN_UPPER: f64 = 10.0;
 
 // Parameters for the genetic algorithms
-const TARGET_LIST: &'static [f64] = &[2.0, 4.0, 6.0, 8.0, 10.0];
+// const TARGET_LIST: &'static [f64] = &[2.0, 4.0, 6.0, 8.0, 10.0];
 const TOURNAMENT_SIZE: u32 = 3;
 const MUTATION_RATE: f64 = 0.01;
 pub const POPULATION_SIZE: i32 = 100;
-pub const FITNESS_THRESHOLD: f64 = 1e-5;
+pub const FITNESS_THRESHOLD: f64 = 1.0;
 pub const NUMBER_ATOMS: i32 = 3;
 pub const FORT_FILES: [&'static str; 3] = ["fort.15", "fort.30", "fort.40"];
 
@@ -69,6 +66,7 @@ pub trait Population: Sized {
     // We use Box to allow for different types of organisms. It does mean
     // that we need to implement As Any for the organism.
     fn quadratic_mating(&mut self) -> Box<dyn Organism>;
+    fn eliminate_unfit_fraction(&mut self);
 }
 
 // Newtype wrapper for Simple Organism population.
@@ -150,10 +148,17 @@ impl Population for Vec<SimpleOrganism> {
         let result = Box::new(child);
         result
     }
+
+    fn eliminate_unfit_fraction(&mut self) {
+        self.sort_by(|a, b| a.get_fitness().partial_cmp(&b.get_fitness()).unwrap());
+
+        self.drain((self.len() / 2)..self.len());
+    }
 }
 
 impl Population for Vec<ForceOrganism> {
     fn natural_selection(&mut self) {
+        assert_eq!(self.len() as i32, POPULATION_SIZE / 2);
         // Copy the original pool so we don't use the new organisms in the mating.
         let new_pool = self.clone();
         // The number of iterations should be equal to the pool since we cut it in half.
@@ -229,10 +234,25 @@ impl Population for Vec<ForceOrganism> {
                 }
             }
         }
+        child.save_to_file("/home/mvee/rust/fegenetics/");
         child.evaluate_fitness(TARGET);
         child.mutate();
         let result = Box::new(child);
         result
+    }
+
+    fn eliminate_unfit_fraction(&mut self) {
+        self.sort_by(|a, b| a.get_fitness().partial_cmp(&b.get_fitness()).unwrap());
+
+        let drained: Vec<_> = self.drain((self.len() / 2)..self.len()).collect();
+
+        for d in drained {
+            // We will delete the directory of the drained organisms.
+            let dir = PathBuf::from(format!("/home/mvee/rust/fegenetics/organisms/{}", d.id));
+            if dir.exists() {
+                std::fs::remove_dir_all(&dir).unwrap();
+            }
+        }
     }
 }
 
@@ -294,7 +314,7 @@ impl Organism for SimpleOrganism {
         self
     }
 
-    fn save_to_file(&self, path: &str) {
+    fn save_to_file(&self, _path: &str) {
         unimplemented!("Will not be implemented for this organism type as it does not need to be saved to a file.")
     }
 }
@@ -337,22 +357,34 @@ impl Organism for ForceOrganism {
     fn evaluate_fitness(&mut self, target: TARGET) {
         let mut fitness = 0.0;
         let organism_freqs = run_spectro(self.id.clone());
+        match organism_freqs {
+            Ok(freqs) => {
+                // println!("The test freqs are {:?}\n", organism_freqs);
 
-        // println!("The test freqs are {:?}\n", organism_freqs);
+                for (c, freq) in freqs.harm.iter().enumerate() {
+                    fitness +=
+                        difference_squared(*freq, target.harm[c]) / (target.harm.len() as f64);
+                }
 
-        for (c, freq) in organism_freqs.harm.iter().enumerate() {
-            fitness += difference_squared(*freq, target.harm[c]);
+                for (c, rot) in freqs.rots[0].iter().enumerate() {
+                    fitness +=
+                        difference_squared(*rot, target.rots[c]) / (target.rots.len() as f64);
+                }
+
+                for (c, freq) in freqs.fund.iter().enumerate() {
+                    fitness +=
+                        difference_squared(*freq, target.fund[c]) / (target.fund.len() as f64);
+                }
+
+                self.fitness = fitness;
+                return;
+            }
+            Err(_) => {
+                // println!("Organism {} failed to evaluate fitness: {}", self.id, e);
+                self.fitness = std::f64::MAX;
+                return;
+            }
         }
-
-        for (c, rot) in organism_freqs.rots[0].iter().enumerate() {
-            fitness += difference_squared(*rot, target.rots[c]);
-        }
-
-        for (c, freq) in organism_freqs.fund.iter().enumerate() {
-            fitness += difference_squared(*freq, target.fund[c]);
-        }
-
-        self.fitness = fitness;
     }
 
     fn mutate(&mut self) {
@@ -376,19 +408,19 @@ impl Organism for ForceOrganism {
 
         organisms_dir.push("organisms");
         create_directory(&organisms_dir);
-        println!(
-            "The organisms directory is: {:?}",
-            organisms_dir.canonicalize().unwrap().display()
-        );
+        // println!(
+        //     "The organisms directory is: {:?}",
+        //     organisms_dir.canonicalize().unwrap().display()
+        // );
 
         // Make each organism's subdirectory. Should be unique due to UUID.
         // Push the organism's subdirectory onto the organisms directory.
         organisms_dir.push(&self.id);
         create_directory(&organisms_dir);
-        println!(
-            "The organism's directory is {:?}",
-            organisms_dir.canonicalize().unwrap().display()
-        );
+        // println!(
+        //     "The organism's directory is {:?}",
+        //     organisms_dir.canonicalize().unwrap().display()
+        // );
 
         // Make three separate files for each chromosome.
         for i in 0..self.dna.len() {
@@ -415,16 +447,6 @@ impl Organism for ForceOrganism {
 fn difference_squared(a: f64, b: f64) -> f64 {
     let diff = a - b;
     diff * diff
-}
-
-pub fn eliminate_unfit_fraction<T>(pool: &mut Vec<T>)
-where
-    T: Organism,
-{
-    // Sort the population by fitness.
-    pool.sort_by(|a, b| a.get_fitness().partial_cmp(&b.get_fitness()).unwrap());
-
-    pool.drain((pool.len() / 2)..pool.len());
 }
 
 pub fn tournament_round<T>(pool: &Vec<T>) -> T
@@ -1300,7 +1322,7 @@ mod tests {
     fn test_elimination() {
         let mut pool: Vec<SimpleOrganism> = generate_test_organism();
 
-        eliminate_unfit_fraction(&mut pool);
+        pool.eliminate_unfit_fraction();
 
         assert_eq!(pool[0].fitness, 1.0);
         assert_eq!(pool[1].fitness, 2.0);
@@ -1393,6 +1415,7 @@ mod tests {
     #[test]
     // Water test case.
     fn test_create_force_organism() {
+        use crate::utils::domain::{FOURTH_DOMAIN, SECOND_DOMAIN, THIRD_DOMAIN};
         let test_org = ForceOrganism::new(3);
 
         println!("{:?}", test_org);
@@ -1429,6 +1452,8 @@ mod tests {
 
     #[test]
     fn test_save_force() {
+        use std::fs;
+        use std::path::Path;
         // Check if ./organisms/water_test exists. If so, delete it.
         // Path to cargo.toml
         let cargo_toml_path = Path::new(env!("CARGO_MANIFEST_DIR"));
