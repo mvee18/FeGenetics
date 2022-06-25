@@ -2,11 +2,12 @@ use std::path::PathBuf;
 use std::process::{Command, Stdio};
 use std::sync::mpsc;
 use std::thread;
+use summarize::Summary;
 
 const SPECTRO_PATH: &str = "src/input/spectro";
 const SPECTRO_IN_PATH: &str = "src/input/spectro.in";
 
-pub fn run_spectro(organism_id: String) -> String {
+pub fn run_spectro(organism_id: String) -> Summary {
     let (tx, rx) = mpsc::channel();
 
     thread::spawn(move || {
@@ -57,41 +58,18 @@ pub fn run_spectro(organism_id: String) -> String {
 
         if output.status.success() {
             // Change working directory back to the original working directory.
-            tx.send(String::from_utf8_lossy(&output.stdout).to_string())
-                .expect("Error sending output to main thread.");
+            tx.send(output.stdout).unwrap();
         } else {
             panic!("Error running spectro in {}", organism_path.display());
         }
     });
 
-    rx.recv().unwrap()
+    // Unwrap the output from the channel. Then, parse the output.
+    parse_spectro(rx.recv().unwrap().to_vec())
 }
 
-pub fn parse_spectro(output: String) -> Vec<String> {
-    use regex::Regex;
-
-    let lines = output.lines();
-    // Regex that matches LXM MATRIX.
-    let mut found = false;
-    let re = Regex::new(r"LXM MATRIX").unwrap();
-    let end_re = Regex::new(r"\s+-{10,}").unwrap();
-
-    let mut result: Vec<String> = vec![String::from("")];
-
-    for line in lines {
-        if re.is_match(line) {
-            found = true;
-        }
-
-        if found {
-            if end_re.is_match(line) {
-                found = false;
-            } else {
-                result.push(line.to_string());
-            }
-        }
-    }
-
+pub fn parse_spectro(output: Vec<u8>) -> Summary {
+    let result = summarize::Summary::new(output);
     result
 }
 
@@ -103,6 +81,14 @@ mod tests {
     fn test_run_spectro() {
         let organism_id = "test_organism";
         let result = run_spectro(organism_id.to_string());
-        println!("{:?}", parse_spectro(result));
+        println!("{:?}", result);
+
+        let expected_harm = vec![3943.976, 3833.989, 1651.332];
+        let expected_fund = vec![3753.156, 3656.489, 1598.834];
+        let expected_rots = vec![14.5054957, 9.2636424, 27.6557350];
+
+        assert_eq!(result.harm, expected_harm);
+        assert_eq!(result.fund, expected_fund);
+        assert_eq!(result.rots[0], expected_rots);
     }
 }

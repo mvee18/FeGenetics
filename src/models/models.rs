@@ -2,7 +2,8 @@ use crate::utils::domain::{
     determine_number_force_constants, Derivatives, FOURTH_DOMAIN, SECOND_DOMAIN, THIRD_DOMAIN,
 };
 use crate::utils::domain::{random_float, random_float_mc};
-use crate::utils::utils::create_directory;
+use crate::utils::utils::{create_directory, Target};
+use lazy_static::lazy_static;
 use rand::seq::SliceRandom;
 use rand_distr::{Distribution, Normal};
 use std::any::Any;
@@ -30,6 +31,11 @@ pub const FITNESS_THRESHOLD: f64 = 1e-5;
 pub const NUMBER_ATOMS: i32 = 3;
 pub const FORT_FILES: [&'static str; 3] = ["fort.15", "fort.30", "fort.40"];
 
+lazy_static! {
+    #[derive(Clone, Copy)]
+    pub static ref TARGET: Target = Target::initialize(&PathBuf::from("/home/mvee/rust/fegenetics/src/input/target.toml"));
+}
+
 // The Organism is a trait (interface).
 pub trait Organism {
     fn new(size: i32) -> Self
@@ -42,13 +48,13 @@ pub trait Organism {
         let mut population: Vec<Self> = Vec::new();
         for _ in 0..pop_size {
             let mut organism = Self::new(DNA_SIZE.try_into().unwrap());
-            organism.evaluate_fitness(TARGET_LIST.to_vec());
+            organism.evaluate_fitness(TARGET);
             population.push(organism);
         }
         population
     }
     fn get_fitness(&self) -> f64;
-    fn evaluate_fitness(&mut self, target: Vec<f64>);
+    fn evaluate_fitness(&mut self, target: TARGET);
     fn mutate(&mut self);
     fn save_to_file(&self, path: &str);
     fn as_any(&self) -> &dyn Any;
@@ -135,7 +141,7 @@ impl Population for Vec<SimpleOrganism> {
         }
 
         // Evaluate the fitness of the child.
-        child.evaluate_fitness(TARGET_LIST.to_vec());
+        child.evaluate_fitness(TARGET);
         child.mutate();
         let result = Box::new(child);
         result
@@ -177,11 +183,11 @@ impl Organism for SimpleOrganism {
         return o;
     }
 
-    fn evaluate_fitness(&mut self, target: Vec<f64>) {
-        assert_eq!(self.dna.len(), target.len());
+    fn evaluate_fitness(&mut self, target: TARGET) {
+        assert_eq!(self.dna.len(), target.harm.len());
         let mut sum: f64 = 0.0;
         for i in 0..self.dna.len() {
-            sum += difference_squared(self.dna[i], target[i]);
+            sum += difference_squared(self.dna[i], target.harm[i]);
         }
 
         // MSE = mean squared error
@@ -246,7 +252,7 @@ impl Organism for ForceOrganism {
         return self.fitness;
     }
 
-    fn evaluate_fitness(&mut self, target: Vec<f64>) {
+    fn evaluate_fitness(&mut self, target: TARGET) {
         unimplemented!()
     }
 
@@ -1158,16 +1164,15 @@ mod tests {
     fn test_evalute_fitness() {
         let mut test_org = SimpleOrganism {
             id: "testOrg".to_string(),
-            dna: vec![1.0, 1.0, 1.0],
+            dna: vec![3943.0, 3833.0, 1651.0],
             fitness: 0.0,
         };
-        let target: Vec<f64> = vec![1.0, 2.0, 3.0];
 
-        test_org.evaluate_fitness(target);
+        test_org.evaluate_fitness(TARGET);
 
         // println!("Wanted fitness: 5.0, got fitness: {}", test_org.fitness);
 
-        let wanted = 1.6666667;
+        let wanted = 0.680307;
 
         assert!((test_org.fitness - wanted).abs() < 0.00001);
     }
@@ -1258,17 +1263,17 @@ mod tests {
     fn test_quadratic_mating_case_one() {
         let p1: SimpleOrganism = SimpleOrganism {
             id: "1".to_string(),
-            dna: vec![-1.0, -1.0, -1.0, -1.0, -1.0],
+            dna: vec![-1.0, -1.0, -1.0],
             fitness: 1.0,
         };
         let p2: SimpleOrganism = SimpleOrganism {
             id: "2".to_string(),
-            dna: vec![0.0, 0.0, 0.0, 0.0, 0.0],
+            dna: vec![0.0, 0.0, 0.0],
             fitness: 0.0,
         };
         let p3: SimpleOrganism = SimpleOrganism {
             id: "3".to_string(),
-            dna: vec![1.0, 1.0, 1.0, 1.0, 1.0],
+            dna: vec![1.0, 1.0, 1.0],
             fitness: 1.0,
         };
         let mut parents = vec![p1, p2, p3];
