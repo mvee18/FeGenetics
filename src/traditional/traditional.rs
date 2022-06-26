@@ -1,5 +1,5 @@
 use crate::models::models::{
-    ForceOrganism, Organism, Population, FITNESS_THRESHOLD, POPULATION_SIZE,
+    ForceOrganism, Organism, Population, FITNESS_THRESHOLD, NUMBER_ATOMS, POPULATION_SIZE,
 };
 use std::time::Instant;
 
@@ -10,7 +10,7 @@ pub fn run_tga() {
     // Create initial pool of organisms.
     // let mut population = create_organism_pool(POPULATION_SIZE);
     //     let mut population = SimpleOrganism::new_population(POPULATION_SIZE);
-    let mut population = ForceOrganism::new_population(POPULATION_SIZE);
+    let mut population = ForceOrganism::new_population(POPULATION_SIZE, NUMBER_ATOMS);
     let mut generation = 0;
 
     // Loop until we find a solution.
@@ -43,6 +43,9 @@ pub fn run_tga() {
                 best_organism.fitness,
                 best_organism.id
             );
+
+            let best_path = format!("/home/mvee/rust/fegenetics/best/{}", generation);
+            best_organism.save_to_file(&best_path);
         }
 
         // Otherwise, we eliminiate the worst half of the population.

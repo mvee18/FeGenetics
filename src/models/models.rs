@@ -6,10 +6,10 @@ use lazy_static::lazy_static;
 use rand::seq::SliceRandom;
 use rand_distr::{Distribution, Normal};
 use std::any::Any;
-use std::fs::File;
+use std::fs::{read_to_string, File};
 use std::io::Write;
 use std::option::Option;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use strum::IntoEnumIterator;
 use uuid::Uuid;
 
@@ -28,6 +28,7 @@ pub const POPULATION_SIZE: i32 = 100;
 pub const FITNESS_THRESHOLD: f64 = 1.0;
 pub const NUMBER_ATOMS: i32 = 3;
 pub const FORT_FILES: [&'static str; 3] = ["fort.15", "fort.30", "fort.40"];
+pub const INITIAL_GUESS: &'static str = "/home/mvee/rust/fegenetics/tests/water_test";
 
 lazy_static! {
     #[derive(Clone, Copy)]
@@ -42,13 +43,13 @@ pub trait Organism {
     fn new(size: i32) -> Self
     where
         Self: Sized;
-    fn new_population(pop_size: i32) -> Vec<Self>
+    fn new_population(pop_size: i32, dna_size: i32) -> Vec<Self>
     where
         Self: Sized,
     {
         let mut population: Vec<Self> = Vec::new();
         for _ in 0..pop_size {
-            let mut organism = Self::new(DNA_SIZE.try_into().unwrap());
+            let mut organism = Self::new(dna_size.try_into().unwrap());
             organism.evaluate_fitness(TARGET);
             population.push(organism);
         }
@@ -325,29 +326,35 @@ impl Organism for ForceOrganism {
     where
         Self: Sized,
     {
-        let mut o = ForceOrganism {
-            id: Uuid::new_v4().to_string(),
-            dna: Vec::with_capacity(3),
-            fitness: 0.0,
-        };
+        if INITIAL_GUESS != "" {
+            let o =
+                ForceOrganism::initial_guess_mock("/home/mvee/rust/fegenetics/tests/water_test");
+            let project_root = env!("CARGO_MANIFEST_DIR");
+            o.save_to_file(project_root);
+            return o;
+        } else {
+            let mut o = ForceOrganism {
+                id: Uuid::new_v4().to_string(),
+                dna: Vec::with_capacity(3),
+                fitness: 0.0,
+            };
 
-        for dn in Derivatives::iter() {
-            let size = determine_number_force_constants(n_atoms, dn);
-            // Make the chromosome that will be pushed onto the DNA.
-            let mut chromosome: Vec<f64> = Vec::with_capacity(size.try_into().unwrap());
+            for dn in Derivatives::iter() {
+                let size = determine_number_force_constants(n_atoms, dn);
+                // Make the chromosome that will be pushed onto the DNA.
+                let mut chromosome: Vec<f64> = Vec::with_capacity(size.try_into().unwrap());
 
-            for _ in 0..size {
-                let gene = random_float_mc(dn);
-                chromosome.push(gene);
+                for _ in 0..size {
+                    let gene = random_float_mc(dn);
+                    chromosome.push(gene);
+                }
+
+                o.dna.push(chromosome);
             }
-
-            o.dna.push(chromosome);
+            let project_root = env!("CARGO_MANIFEST_DIR");
+            o.save_to_file(project_root);
+            return o;
         }
-
-        let project_root = env!("CARGO_MANIFEST_DIR");
-        o.save_to_file(project_root);
-
-        return o;
     }
 
     fn get_fitness(&self) -> f64 {
@@ -390,7 +397,7 @@ impl Organism for ForceOrganism {
     fn mutate(&mut self) {
         for chromosome in self.dna.iter_mut() {
             for gene in chromosome.iter_mut() {
-                if random_float(0.0, 1.0) < MUTATION_RATE {
+                if random_float(0.0, 1.0).abs() < MUTATION_RATE {
                     let norm_distr = Normal::new(*gene, 0.1).unwrap();
                     *gene = norm_distr.sample(&mut rand::thread_rng());
                 }
@@ -441,6 +448,54 @@ impl Organism for ForceOrganism {
             file.write_all("\n".as_bytes())
                 .expect("Could not write to file.");
         }
+    }
+}
+
+impl ForceOrganism {
+    fn read_from_file(path: &str) -> Self {
+        let mut o = ForceOrganism {
+            id: Uuid::new_v4().to_string(),
+            dna: Vec::with_capacity(3),
+            fitness: 0.0,
+        };
+
+        let parent_dir = Path::new(path);
+
+        // Closure that will open each file, skip the header, and turn the data into a Vec<f64>.
+        let read_file = |file_path: &Path| {
+            let raw_data = read_to_string(file_path).expect("Could not read file.");
+            let mut data = raw_data
+                .split_whitespace()
+                .map(|x| x.parse::<f64>().unwrap())
+                .collect::<Vec<f64>>();
+            // Remove the first two elements.
+            data.drain(0..2);
+
+            return data;
+        };
+
+        for fort_file in FORT_FILES.iter() {
+            let file_path = parent_dir.join(fort_file);
+            let data = read_file(&file_path);
+            o.dna.push(data);
+        }
+
+        o
+    }
+
+    pub fn initial_guess_mock(path: &str) -> Self {
+        let mut organism = ForceOrganism::read_from_file(path);
+        // We will iterate over each gene and mutate it slightly.
+        for chromosome in organism.dna.iter_mut() {
+            for gene in chromosome.iter_mut() {
+                if (*gene - 0.0).abs() < 0.0000001 {
+                    continue;
+                }
+                *gene += random_float(-0.1, 0.1);
+            }
+        }
+
+        organism
     }
 }
 
@@ -515,21 +570,6 @@ pub fn linear_interpolation(best: f64, worst: f64) -> Option<f64> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    fn generate_test_organism() -> Vec<SimpleOrganism> {
-        let mut o1 = SimpleOrganism::new(3);
-        o1.fitness = 1.0;
-        let mut o2 = SimpleOrganism::new(3);
-        o2.fitness = 3.0;
-
-        let mut o3 = SimpleOrganism::new(3);
-        o3.fitness = 2.0;
-
-        let mut o4 = SimpleOrganism::new(3);
-        o4.fitness = 5.0;
-
-        vec![o1, o2, o3, o4]
-    }
-
     fn generate_water_organism() -> ForceOrganism {
         let chr1 = vec![
             0.0000000000,
@@ -1288,6 +1328,21 @@ mod tests {
         }
     }
 
+    fn generate_test_organism() -> Vec<SimpleOrganism> {
+        let mut o1 = SimpleOrganism::new(3);
+        o1.fitness = 1.0;
+        let mut o2 = SimpleOrganism::new(3);
+        o2.fitness = 3.0;
+
+        let mut o3 = SimpleOrganism::new(3);
+        o3.fitness = 2.0;
+
+        let mut o4 = SimpleOrganism::new(3);
+        o4.fitness = 5.0;
+
+        vec![o1, o2, o3, o4]
+    }
+
     #[test]
     fn test_evalute_fitness() {
         let mut test_org = SimpleOrganism {
@@ -1488,5 +1543,20 @@ mod tests {
         let mut o = generate_water_organism();
         o.evaluate_fitness(TARGET);
         assert!(o.fitness - 2.333333e-06 < 0.000001);
+    }
+
+    #[test]
+    fn test_read_from_file() {
+        let cargo_dir = Path::new(env!("CARGO_MANIFEST_DIR"));
+        let organism_path = cargo_dir.join("tests").join("water_test");
+        let o = ForceOrganism::read_from_file(organism_path.to_str().unwrap());
+
+        let wanted_organism = generate_water_organism();
+
+        for (i, chromosome) in wanted_organism.dna.iter().enumerate() {
+            for (j, gene) in chromosome.iter().enumerate() {
+                assert_eq!(o.dna[i][j], *gene);
+            }
+        }
     }
 }
