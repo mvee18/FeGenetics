@@ -16,13 +16,13 @@ pub fn run_tga() {
     // Loop until we find a solution.
     loop {
         // Sort the population by fitness.
-        population.sort_by(|a, b| a.fitness.partial_cmp(&b.fitness).unwrap());
+        population.sort_by(|a, b| a.get_fitness().partial_cmp(&b.get_fitness()).unwrap());
 
         // The best organisms is the first one.
         let best_organism = &population[0];
 
         // Check if the best organism has a fitness of 1.0 or less.
-        if best_organism.fitness <= FITNESS_THRESHOLD {
+        if best_organism.get_fitness() <= FITNESS_THRESHOLD {
             println!("Yes. The superior fighter is clear.");
             println!(
                 "Found solution in generation {}. The organism is {:?}.",
@@ -40,7 +40,7 @@ pub fn run_tga() {
                 "Time taken: {:?} | Generation {} | Fitness {} | Best Organism {}",
                 Instant::now().duration_since(start_time),
                 generation,
-                best_organism.fitness,
+                best_organism.get_fitness(),
                 best_organism.id
             );
 

@@ -209,6 +209,7 @@ impl Population for Vec<ForceOrganism> {
                 0 => self.sort_by(|a, b| a.harmfitness.partial_cmp(&b.harmfitness).unwrap()),
                 1 => self.sort_by(|a, b| a.rotfitness.partial_cmp(&b.rotfitness).unwrap()),
                 2 => self.sort_by(|a, b| a.fundfitness.partial_cmp(&b.fundfitness).unwrap()),
+                _ => panic!("Invalid chromosome index."),
             }
 
             match i {
@@ -233,6 +234,7 @@ impl Population for Vec<ForceOrganism> {
                         &self[2].fundfitness,
                     )
                 }
+                _ => panic!("Invalid chromosome index."),
             }
 
             // a = p1, b = p2, c = p3.
@@ -376,7 +378,9 @@ impl Organism for ForceOrganism {
             let mut o = ForceOrganism {
                 id: Uuid::new_v4().to_string(),
                 dna: Vec::with_capacity(3),
-                fitness: 0.0,
+                harmfitness: 0.0,
+                rotfitness: 0.0,
+                fundfitness: 0.0,
             };
 
             for dn in Derivatives::iter() {
@@ -398,37 +402,45 @@ impl Organism for ForceOrganism {
     }
 
     fn get_fitness(&self) -> f64 {
-        return self.fitness;
+        let fitness = self.harmfitness + self.rotfitness + self.fundfitness;
+        return fitness;
     }
 
     fn evaluate_fitness(&mut self, target: TARGET) {
-        let mut fitness = 0.0;
         let organism_freqs = run_spectro(self.id.clone());
         match organism_freqs {
             Ok(freqs) => {
                 // println!("The test freqs are {:?}\n", organism_freqs);
 
+                let mut hfitness = 0.0;
                 for (c, freq) in freqs.lxm_freqs.iter().enumerate() {
-                    fitness +=
+                    hfitness +=
                         difference_squared(*freq, target.harm[c]) / (target.harm.len() as f64);
                 }
 
+                self.harmfitness = hfitness;
+
+                let mut rfitness = 0.0;
                 for (c, rot) in freqs.rots[0].iter().enumerate() {
-                    fitness +=
+                    rfitness +=
                         difference_squared(*rot, target.rots[c]) / (target.rots.len() as f64);
                 }
 
+                self.rotfitness = rfitness;
+
+                let mut ffitness = 0.0;
                 for (c, freq) in freqs.fund.iter().enumerate() {
-                    fitness +=
+                    ffitness +=
                         difference_squared(*freq, target.fund[c]) / (target.fund.len() as f64);
                 }
 
-                self.fitness = fitness;
+                self.fundfitness = ffitness;
                 return;
             }
             Err(_) => {
                 // println!("Organism {} failed to evaluate fitness: {}", self.id, e);
-                self.fitness = std::f64::MAX;
+                (self.harmfitness, self.rotfitness, self.fundfitness) =
+                    (std::f64::MAX, std::f64::MAX, std::f64::MAX);
                 return;
             }
         }
@@ -493,11 +505,7 @@ impl Organism for ForceOrganism {
 
 impl ForceOrganism {
     fn read_from_file(path: &str) -> Self {
-        let mut o = ForceOrganism {
-            id: Uuid::new_v4().to_string(),
-            dna: Vec::with_capacity(3),
-            fitness: 0.0,
-        };
+        let mut o = ForceOrganism::newchild();
 
         let parent_dir = Path::new(path);
 
@@ -536,6 +544,16 @@ impl ForceOrganism {
         }
 
         organism
+    }
+
+    pub fn newchild() -> Self {
+        ForceOrganism {
+            id: Uuid::new_v4().to_string(),
+            dna: Vec::with_capacity(3),
+            harmfitness: 0.0,
+            rotfitness: 0.0,
+            fundfitness: 0.0,
+        }
     }
 }
 
@@ -1364,7 +1382,9 @@ mod tests {
         ForceOrganism {
             id: "water_test".to_string(),
             dna: vec![chr1, chr2, chr3],
-            fitness: 0.0,
+            harmfitness: 0.0,
+            rotfitness: 0.0,
+            fundfitness: 0.0,
         }
     }
 
@@ -1582,8 +1602,10 @@ mod tests {
     fn test_water_evaluate() {
         let mut o = generate_water_organism();
         o.evaluate_fitness(TARGET);
-        println!("Fitness = {}", o.fitness);
-        assert!(o.fitness - 2.333333e-06 < 0.000001);
+        println!("Fitness = {}", o.get_fitness());
+        assert!(o.harmfitness - 2.333333e-06 < 0.000001);
+        assert_eq!(o.rotfitness, 0.0);
+        assert_eq!(o.fundfitness, 0.0);
     }
 
     #[test]
