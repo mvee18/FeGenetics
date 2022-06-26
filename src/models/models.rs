@@ -193,23 +193,60 @@ impl Population for Vec<ForceOrganism> {
                 Vec::with_capacity(self[0].dna[1].len()),
                 Vec::with_capacity(self[0].dna[2].len()),
             ],
-            fitness: 0.0,
+            harmfitness: 0.0,
+            rotfitness: 0.0,
+            fundfitness: 0.0,
         };
 
         // We need to sort the vector by fitness.
-        self.sort_by(|a, b| a.fitness.partial_cmp(&b.fitness).unwrap());
 
         // Now, we fit to a quadratic curve. The first parent is the most fit.
-        let (p1, p2, p3) = (&self[0], &self[1], &self[2]);
 
-        // Now, we iterate over the DNA of the first parent.
-        for i in 0..p1.dna.len() {
-            for j in 0..p1.dna[i].len() {
-                let a = (1.0 / (p3.dna[i][j] - p2.dna[i][j]))
-                    * (((p3.fitness - p1.fitness) / (p3.dna[i][j] - p1.dna[i][j]))
-                        - ((p2.fitness - p1.fitness) / (p2.dna[i][j] - p1.dna[i][j])));
-                let b = ((p2.fitness - p1.fitness) / (p2.dna[i][j] - p1.dna[i][j]))
-                    - (a * (p2.dna[i][j] + p1.dna[i][j]));
+        // Now, we iterate over the three chromosomes.
+        for i in 0..3 {
+            let (f1, f2, f3);
+            match i {
+                0 => self.sort_by(|a, b| a.harmfitness.partial_cmp(&b.harmfitness).unwrap()),
+                1 => self.sort_by(|a, b| a.rotfitness.partial_cmp(&b.rotfitness).unwrap()),
+                2 => self.sort_by(|a, b| a.fundfitness.partial_cmp(&b.fundfitness).unwrap()),
+            }
+
+            match i {
+                0 => {
+                    (f1, f2, f3) = (
+                        &self[0].harmfitness,
+                        &self[1].harmfitness,
+                        &self[2].harmfitness,
+                    )
+                }
+                1 => {
+                    (f1, f2, f3) = (
+                        &self[0].rotfitness,
+                        &self[1].rotfitness,
+                        &self[2].rotfitness,
+                    )
+                }
+                2 => {
+                    (f1, f2, f3) = (
+                        &self[0].fundfitness,
+                        &self[1].fundfitness,
+                        &self[2].fundfitness,
+                    )
+                }
+            }
+
+            // a = p1, b = p2, c = p3.
+            let (p1, p2, p3) = (&self[0], &self[1], &self[2]);
+            let zipped = p1.dna[i]
+                .iter()
+                .zip(p2.dna[i].iter())
+                .zip(p3.dna[i].iter())
+                .map(|((a, b), c)| (a, b, c));
+
+            // Now, we perform the quadratic interpolation using a closure.
+            for (g1, g2, g3) in zipped {
+                let a = (1.0 / (g3 - g2)) * (((f3 - f1) / (g3 - g1)) - ((f2 - f1) / (g2 - g1)));
+                let b = ((f2 - f1) / (g2 - g1)) - (a * (g2 + g1));
 
                 let critical_point: f64 = b / (-2.0 * a);
                 let concavity = 2.0 * a;
@@ -223,13 +260,14 @@ impl Population for Vec<ForceOrganism> {
                     child.dna[i].push(critical_point);
                 } else {
                     // Otherwise, we should use a linear interpolation.
-                    let result = linear_interpolation(p1.dna[i][j], p3.dna[i][j]);
+                    let result = linear_interpolation(*g1, *g3);
                     match result {
                         Some(x) => child.dna[i].push(x),
                         // If None, i.e., the linear interpolation failed, we randomly select one of the parents.
                         None => {
-                            let rand_parent = self.choose(&mut rand::thread_rng()).unwrap();
-                            child.dna[i].push(rand_parent.dna[i][j]);
+                            let parents = vec![g1, g2, g3];
+                            let rand_parent = parents.choose(&mut rand::thread_rng()).unwrap();
+                            child.dna[i].push(**rand_parent);
                         }
                     }
                 }
@@ -261,7 +299,9 @@ impl Population for Vec<ForceOrganism> {
 pub struct ForceOrganism {
     pub id: String,
     pub dna: Vec<Vec<f64>>,
-    pub fitness: f64,
+    pub harmfitness: f64,
+    pub rotfitness: f64,
+    pub fundfitness: f64,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -1542,6 +1582,7 @@ mod tests {
     fn test_water_evaluate() {
         let mut o = generate_water_organism();
         o.evaluate_fitness(TARGET);
+        println!("Fitness = {}", o.fitness);
         assert!(o.fitness - 2.333333e-06 < 0.000001);
     }
 
