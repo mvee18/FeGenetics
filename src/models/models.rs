@@ -22,9 +22,9 @@ const DOMAIN_UPPER: f64 = 10.0;
 
 // Parameters for the genetic algorithms
 // const TARGET_LIST: &'static [f64] = &[2.0, 4.0, 6.0, 8.0, 10.0];
-const TOURNAMENT_SIZE: u32 = 3;
+const TOURNAMENT_SIZE: u32 = 6;
 const MUTATION_RATE: f64 = 0.01;
-pub const POPULATION_SIZE: i32 = 100;
+pub const POPULATION_SIZE: i32 = 400;
 pub const FITNESS_THRESHOLD: f64 = 1.0;
 pub const NUMBER_ATOMS: i32 = 3;
 pub const FORT_FILES: [&'static str; 3] = ["fort.15", "fort.30", "fort.40"];
@@ -449,6 +449,9 @@ impl Organism for ForceOrganism {
     fn mutate(&mut self) {
         for chromosome in self.dna.iter_mut() {
             for gene in chromosome.iter_mut() {
+                if gene == &0.0 {
+                    continue;
+                }
                 if random_float(0.0, 1.0).abs() < MUTATION_RATE {
                     let norm_distr = Normal::new(*gene, 0.1).unwrap();
                     *gene = norm_distr.sample(&mut rand::thread_rng());

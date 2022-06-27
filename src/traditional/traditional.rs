@@ -35,7 +35,7 @@ pub fn run_tga() {
             return;
         }
 
-        if generation % 100 == 0 {
+        if generation % 50 == 0 {
             println!(
                 "Time taken: {:?} | Generation {} | Fitness {} | Best Organism {}",
                 Instant::now().duration_since(start_time),
