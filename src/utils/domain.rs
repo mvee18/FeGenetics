@@ -12,6 +12,18 @@ pub enum Derivatives {
     Fourth,
 }
 
+impl Derivatives {
+    // This function will take 0 and return Second, 1 and return Third, etc.
+    pub fn from_index(index: usize) -> Derivatives {
+        match index {
+            0 => Derivatives::Second,
+            1 => Derivatives::Third,
+            2 => Derivatives::Fourth,
+            _ => panic!("Invalid index"),
+        }
+    }
+}
+
 pub fn random_float(min: f64, max: f64) -> f64 {
     let mut rng = rand::thread_rng();
     let sign = rand::random::<bool>();
@@ -47,6 +59,40 @@ pub fn random_float_mc(dn: Derivatives) -> f64 {
         n
     } else {
         -n
+    }
+}
+
+pub fn check_and_fix_domain(dn: Derivatives, gene: &mut f64) {
+    while !check_normal_bounds(dn, gene) {
+        *gene = random_float_mc(dn);
+    }
+    // We need to reduce the gene by a random amount to ensure it is within the
+    // domain.
+}
+
+pub fn check_normal_bounds(dn: Derivatives, n: &f64) -> bool {
+    match dn {
+        Derivatives::Second => {
+            if n.abs() <= SECOND_DOMAIN {
+                true
+            } else {
+                false
+            }
+        }
+        Derivatives::Third => {
+            if n.abs() <= THIRD_DOMAIN {
+                true
+            } else {
+                false
+            }
+        }
+        Derivatives::Fourth => {
+            if n.abs() <= FOURTH_DOMAIN {
+                true
+            } else {
+                false
+            }
+        }
     }
 }
 

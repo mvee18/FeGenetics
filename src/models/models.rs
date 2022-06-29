@@ -1,5 +1,5 @@
 use crate::programs::spectro::run_spectro;
-use crate::utils::domain::{determine_number_force_constants, Derivatives};
+use crate::utils::domain::{check_and_fix_domain, determine_number_force_constants, Derivatives};
 use crate::utils::domain::{random_float, random_float_mc};
 use crate::utils::utils::{create_directory, Target};
 use lazy_static::lazy_static;
@@ -22,9 +22,9 @@ const DOMAIN_UPPER: f64 = 10.0;
 
 // Parameters for the genetic algorithms
 // const TARGET_LIST: &'static [f64] = &[2.0, 4.0, 6.0, 8.0, 10.0];
-const TOURNAMENT_SIZE: u32 = 6;
-const MUTATION_RATE: f64 = 0.01;
-pub const POPULATION_SIZE: i32 = 400;
+const TOURNAMENT_SIZE: u32 = 300;
+const MUTATION_RATE: f64 = 0.10;
+pub const POPULATION_SIZE: i32 = 8000;
 pub const FITNESS_THRESHOLD: f64 = 1.0;
 pub const NUMBER_ATOMS: i32 = 3;
 pub const FORT_FILES: [&'static str; 3] = ["fort.15", "fort.30", "fort.40"];
@@ -447,14 +447,16 @@ impl Organism for ForceOrganism {
     }
 
     fn mutate(&mut self) {
-        for chromosome in self.dna.iter_mut() {
+        for (i, chromosome) in self.dna.iter_mut().enumerate() {
             for gene in chromosome.iter_mut() {
                 if gene == &0.0 {
                     continue;
                 }
                 if random_float(0.0, 1.0).abs() < MUTATION_RATE {
-                    let norm_distr = Normal::new(*gene, 0.1).unwrap();
+                    let norm_distr = Normal::new(*gene, 0.01).unwrap();
                     *gene = norm_distr.sample(&mut rand::thread_rng());
+
+                    check_and_fix_domain(Derivatives::from_index(i), gene)
                 }
             }
         }
