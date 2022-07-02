@@ -14,11 +14,20 @@ pub fn create_directory(path: &PathBuf) {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Target {
     pub harm: Vec<f64>,
     pub rots: Vec<f64>,
     pub fund: Vec<f64>,
+    pub number_atoms: i32,
+    pub population_size: i32,
+    pub tournament_size: u32,
+    pub mutation_rate: f64,
+    pub mutation_strength: f64,
+    pub fitness_threshold: f64,
+    pub initial_guess: String,
+    pub spectro_path: String,
+    pub spectro_in_path: String,
 }
 
 impl Target {
@@ -32,4 +41,31 @@ pub fn read_input_toml(path: &PathBuf) -> Target {
     let mut contents = String::new();
     file.read_to_string(&mut contents).unwrap();
     toml::from_str(&contents).unwrap()
+}
+
+// Get executable path's directory and return as str.
+pub fn get_executable_path() -> PathBuf {
+    let mut path = std::env::current_exe().unwrap();
+    path.pop();
+    path
+}
+
+pub fn get_target_path() -> PathBuf {
+    let mut path = get_executable_path();
+    path.push("target.toml");
+    path
+}
+
+//Tests
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn test_parse_toml() {
+        let input_path = PathBuf::from("/home/mvee/rust/fegenetics/src/input/target.toml");
+        let test_target = Target::initialize(&input_path);
+        assert_eq!(test_target.mutation_rate, 0.20);
+        assert_eq!(test_target.mutation_strength, 5E-9);
+        assert_eq!(test_target.fitness_threshold, 1.0);
+    }
 }

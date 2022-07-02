@@ -1,7 +1,7 @@
 use crate::programs::spectro::run_spectro;
 use crate::utils::domain::{check_and_fix_domain, determine_number_force_constants, Derivatives};
 use crate::utils::domain::{random_float, random_float_mc};
-use crate::utils::utils::{create_directory, Target};
+use crate::utils::utils::{create_directory, get_executable_path, get_target_path, Target};
 use lazy_static::lazy_static;
 use rand::seq::SliceRandom;
 use rand_distr::{Distribution, Normal};
@@ -22,17 +22,18 @@ const DOMAIN_UPPER: f64 = 10.0;
 
 // Parameters for the genetic algorithms
 // const TARGET_LIST: &'static [f64] = &[2.0, 4.0, 6.0, 8.0, 10.0];
-const TOURNAMENT_SIZE: u32 = 300;
-const MUTATION_RATE: f64 = 0.10;
-pub const POPULATION_SIZE: i32 = 8000;
-pub const FITNESS_THRESHOLD: f64 = 1.0;
-pub const NUMBER_ATOMS: i32 = 3;
-pub const FORT_FILES: [&'static str; 3] = ["fort.15", "fort.30", "fort.40"];
-pub const INITIAL_GUESS: &'static str = "/home/mvee/rust/fegenetics/tests/water_test";
+const FORT_FILES: [&'static str; 3] = ["fort.15", "fort.30", "fort.40"];
 
 lazy_static! {
     #[derive(Clone, Copy)]
-    pub static ref TARGET: Target = Target::initialize(&PathBuf::from("/home/mvee/rust/fegenetics/src/input/target.toml"));
+    pub static ref TARGET: Target = Target::initialize(&get_target_path());
+    pub static ref TOURNAMENT_SIZE: u32 = TARGET.tournament_size;
+    pub static ref MUTATION_RATE: f64 = TARGET.mutation_rate;
+    pub static ref POPULATION_SIZE: i32 = TARGET.population_size;
+    pub static ref FITNESS_THRESHOLD: f64 = TARGET.fitness_threshold;
+    pub static ref NUMBER_ATOMS: i32 = TARGET.number_atoms;
+    pub static ref INITIAL_GUESS: &'static str = TARGET.initial_guess.as_str();
+    pub static ref EXE_DIR_PATH: PathBuf = get_executable_path();
     // This is for the simple organisms.
     // #[derive(Clone, Copy)]
     // pub static ref TARGET: Target = Target::initialize(&PathBuf::from("/home/mvee/rust/fegenetics/tests/simple/target.toml"));
@@ -58,7 +59,7 @@ pub trait Organism {
     fn get_fitness(&self) -> f64;
     fn evaluate_fitness(&mut self, target: TARGET);
     fn mutate(&mut self);
-    fn save_to_file(&self, path: &str);
+    fn save_to_file(&self, path: &PathBuf, best: bool);
     fn as_any(&self) -> &dyn Any;
 }
 
@@ -159,7 +160,7 @@ impl Population for Vec<SimpleOrganism> {
 
 impl Population for Vec<ForceOrganism> {
     fn natural_selection(&mut self) {
-        assert_eq!(self.len() as i32, POPULATION_SIZE / 2);
+        assert_eq!(self.len() as i32, *POPULATION_SIZE / 2);
         // Copy the original pool so we don't use the new organisms in the mating.
         let new_pool = self.clone();
         // The number of iterations should be equal to the pool since we cut it in half.
@@ -275,7 +276,8 @@ impl Population for Vec<ForceOrganism> {
                 }
             }
         }
-        child.save_to_file("/home/mvee/rust/fegenetics/");
+
+        child.save_to_file(&EXE_DIR_PATH, false);
         child.evaluate_fitness(TARGET);
         child.mutate();
         let result = Box::new(child);
@@ -342,7 +344,7 @@ impl Organism for SimpleOrganism {
     fn mutate(&mut self) {
         // Generate random float for mutation chance.
         for i in 0..self.dna.len() {
-            if random_float(0.0, 1.0) < MUTATION_RATE {
+            if random_float(0.0, 1.0) < *MUTATION_RATE {
                 let norm_distr = Normal::new(self.dna[i], 0.1).unwrap();
                 self.dna[i] = norm_distr.sample(&mut rand::thread_rng());
             }
@@ -357,7 +359,7 @@ impl Organism for SimpleOrganism {
         self
     }
 
-    fn save_to_file(&self, _path: &str) {
+    fn save_to_file(&self, _path: &PathBuf, _best: bool) {
         unimplemented!("Will not be implemented for this organism type as it does not need to be saved to a file.")
     }
 }
@@ -368,11 +370,9 @@ impl Organism for ForceOrganism {
     where
         Self: Sized,
     {
-        if INITIAL_GUESS != "" {
-            let o =
-                ForceOrganism::initial_guess_mock("/home/mvee/rust/fegenetics/tests/water_test");
-            let project_root = env!("CARGO_MANIFEST_DIR");
-            o.save_to_file(project_root);
+        if *INITIAL_GUESS != "" {
+            let o = ForceOrganism::initial_guess_mock(*INITIAL_GUESS);
+            o.save_to_file(&EXE_DIR_PATH, false);
             return o;
         } else {
             let mut o = ForceOrganism {
@@ -395,8 +395,7 @@ impl Organism for ForceOrganism {
 
                 o.dna.push(chromosome);
             }
-            let project_root = env!("CARGO_MANIFEST_DIR");
-            o.save_to_file(project_root);
+            o.save_to_file(&EXE_DIR_PATH, false);
             return o;
         }
     }
@@ -452,8 +451,8 @@ impl Organism for ForceOrganism {
                 if gene == &0.0 {
                     continue;
                 }
-                if random_float(0.0, 1.0).abs() < MUTATION_RATE {
-                    let norm_distr = Normal::new(*gene, 0.01).unwrap();
+                if random_float(0.0, 1.0).abs() < *MUTATION_RATE {
+                    let norm_distr = Normal::new(*gene, 5e-8).unwrap();
                     *gene = norm_distr.sample(&mut rand::thread_rng());
 
                     check_and_fix_domain(Derivatives::from_index(i), gene)
@@ -466,11 +465,12 @@ impl Organism for ForceOrganism {
         self
     }
 
-    fn save_to_file(&self, path: &str) {
+    fn save_to_file(&self, path: &PathBuf, best: bool) {
         // Make organisms directory if it doesn't exist.
         let mut organisms_dir = PathBuf::from(path);
-
-        organisms_dir.push("organisms");
+        if !best {
+            organisms_dir.push("organisms");
+        }
         create_directory(&organisms_dir);
         // println!(
         //     "The organisms directory is: {:?}",
@@ -490,7 +490,7 @@ impl Organism for ForceOrganism {
         for i in 0..self.dna.len() {
             let mut file = File::create(organisms_dir.join(format!("{}", FORT_FILES[i])))
                 .expect("Could not create file.");
-            let header = format!("{:>5}{:>5}", NUMBER_ATOMS, self.dna[i].len());
+            let header = format!("{:>5}{:>5}", *NUMBER_ATOMS, self.dna[i].len());
             file.write(header.as_bytes())
                 .expect("Could not write to file.");
             for j in 0..self.dna[i].len() {
@@ -544,7 +544,7 @@ impl ForceOrganism {
                 if (*gene - 0.0).abs() < 0.0000001 {
                     continue;
                 }
-                *gene += random_float(-0.1, 0.1);
+                *gene += random_float(-0.01, 0.01);
             }
         }
 
@@ -593,7 +593,7 @@ where
     // Then, we will shuffle the sequence and take the first TOURNAMENT_SIZE elements.
     let mut v: Vec<u32> = (0..pool.len().try_into().unwrap()).collect();
     v.shuffle(&mut rand::thread_rng());
-    for i in 0..TOURNAMENT_SIZE {
+    for i in 0..*TOURNAMENT_SIZE {
         // Make sure it fits.
         let index = usize::try_from(i).unwrap();
 
@@ -1584,7 +1584,7 @@ mod tests {
 
         let o = generate_water_organism();
 
-        o.save_to_file(cargo_toml_path.to_str().unwrap());
+        o.save_to_file(&PathBuf::from(cargo_toml_path), false);
 
         // Read the file back in and compare the contents.
         let fort15 = fs::read_to_string(organism_path.join("fort.15")).unwrap();

@@ -1,5 +1,6 @@
 use crate::models::models::{
-    ForceOrganism, Organism, Population, FITNESS_THRESHOLD, NUMBER_ATOMS, POPULATION_SIZE,
+    ForceOrganism, Organism, Population, EXE_DIR_PATH, FITNESS_THRESHOLD, NUMBER_ATOMS,
+    POPULATION_SIZE,
 };
 use std::time::Instant;
 
@@ -10,7 +11,7 @@ pub fn run_tga() {
     // Create initial pool of organisms.
     // let mut population = create_organism_pool(POPULATION_SIZE);
     //     let mut population = SimpleOrganism::new_population(POPULATION_SIZE);
-    let mut population = ForceOrganism::new_population(POPULATION_SIZE, NUMBER_ATOMS);
+    let mut population = ForceOrganism::new_population(*POPULATION_SIZE, *NUMBER_ATOMS);
     let mut generation = 0;
 
     // Loop until we find a solution.
@@ -22,7 +23,7 @@ pub fn run_tga() {
         let best_organism = &population[0];
 
         // Check if the best organism has a fitness of 1.0 or less.
-        if best_organism.get_fitness() <= FITNESS_THRESHOLD {
+        if best_organism.get_fitness() <= *FITNESS_THRESHOLD {
             println!("Yes. The superior fighter is clear.");
             println!(
                 "Found solution in generation {}. The organism is {:?}.",
@@ -43,12 +44,15 @@ pub fn run_tga() {
                 best_organism.get_fitness(),
                 best_organism.id
             );
+            let best_path = &EXE_DIR_PATH
+                .join("best")
+                .join(format!("{}", generation))
+                .join(format!("{}", best_organism.id));
 
-            let best_path = format!("/home/mvee/rust/fegenetics/best/{}", generation);
-            best_organism.save_to_file(&best_path);
+            best_organism.save_to_file(best_path, true);
         }
 
-        // Otherwise, we eliminiate the worst half of the population.
+        // Otherwise, we eliminiate the worst half of the population
         population.eliminate_unfit_fraction();
 
         // Perform natural selection on the remaining population.

@@ -5,9 +5,13 @@ use std::sync::mpsc;
 use std::thread;
 use summarize::Summary;
 
+use crate::models::models::EXE_DIR_PATH;
+
 const SPECTRO_PATH: &str = "/home/mvee/rust/fegenetics/src/input/spectro";
 const SPECTRO_IN_PATH: &str = "/home/mvee/rust/fegenetics/src/input/spectro.in";
 
+/*
+Incase we need to do this ourselves and not use summarize.
 pub struct Spectro {
     harm: Vec<f64>,
     rots: Vec<f64>,
@@ -21,6 +25,7 @@ enum State {
     Done,
     None,
 }
+*/
 
 pub fn run_spectro(organism_id: String) -> Result<Summary, Box<dyn Error>> {
     let (tx, rx) = mpsc::channel();
@@ -38,12 +43,11 @@ pub fn run_spectro(organism_id: String) -> Result<Summary, Box<dyn Error>> {
                 .unwrap();
         } else {
             // println!("Trying organism {}", organism_id);
-            organism_path = PathBuf::from(format!(
-                "/home/mvee/rust/fegenetics/organisms/{}",
-                organism_id
-            ))
-            .canonicalize()
-            .unwrap();
+            organism_path = EXE_DIR_PATH
+                .join("organisms")
+                .join(organism_id)
+                .canonicalize()
+                .unwrap();
         }
 
         // Get absolute path to SPECTRO_PATH.
@@ -53,12 +57,12 @@ pub fn run_spectro(organism_id: String) -> Result<Summary, Box<dyn Error>> {
         let spectro_in_path = PathBuf::from(SPECTRO_IN_PATH).canonicalize().unwrap();
 
         // Get current working directory.
-        let cwd = std::env::current_dir().unwrap();
+        // let cwd = std::env::current_dir().unwrap();
 
         // println!("cwd: {:?}\n\n", cwd);
 
         // Change working directory to the organism path.
-        std::env::set_current_dir(&organism_path).unwrap();
+        // std::env::set_current_dir(&organism_path).unwrap();
 
         // let file_contents = std::fs::read_to_string(spectro_in_path).unwrap();
         let input_file = std::fs::File::open(spectro_in_path).unwrap();
@@ -73,11 +77,12 @@ pub fn run_spectro(organism_id: String) -> Result<Summary, Box<dyn Error>> {
         let command = Command::new(&spectro_path)
             .stdin(input_file)
             .stdout(Stdio::piped())
+            .current_dir(&organism_path)
             .spawn()
             .unwrap();
 
         let output = command.wait_with_output().unwrap();
-        std::env::set_current_dir(&cwd).unwrap();
+        // std::env::set_current_dir(&cwd).unwrap();
 
         if output.status.success() {
             // Change working directory back to the original working directory.
@@ -97,6 +102,7 @@ pub fn parse_spectro(output: Vec<u8>) -> Result<Summary, Box<dyn std::error::Err
     result
 }
 
+/*
 pub fn run_spectro_local(path: String) {
     let (tx, rx) = mpsc::channel();
 
@@ -157,6 +163,7 @@ pub fn parse_spectro_local(spectro_output: Vec<u8>) {
     // Print line by line.
     for line in output_str.lines() {}
 }
+*/
 
 #[cfg(test)]
 mod tests {
