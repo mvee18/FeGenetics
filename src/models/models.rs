@@ -291,7 +291,7 @@ impl Population for Vec<ForceOrganism> {
 
         for d in drained {
             // We will delete the directory of the drained organisms.
-            let dir = PathBuf::from(format!("/home/mvee/rust/fegenetics/organisms/{}", d.id));
+            let dir = PathBuf::from(&EXE_DIR_PATH.join("organisms").join(&d.id));
             if dir.exists() {
                 std::fs::remove_dir_all(&dir).unwrap();
             }
