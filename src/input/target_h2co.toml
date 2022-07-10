@@ -1,0 +1,16 @@
+# This file must be in the same directory as the binary.
+# Place the harmonic, rotational constants, and fundamental frequencies here.
+harm = [3004.62, 2932.68, 1778.64, 1534.26, 1269.89, 1186.85, 0.02, 0.01, 0.01, 0.00, 0.00, 0.01]
+rots = [1.2915249, 1.1310437, 9.3996696]
+fund = [2783.108, 2777.656, 1747.750, 1499.552, 1247.308, 1167.288]
+# Place the genetic algorithm parameters here.
+number_atoms = 4
+population_size = 1500
+tournament_size = 12
+mutation_rate = 0.30
+mutation_strength = 5E-8
+fitness_threshold = 1.0
+# Place the paths to the input files here if they are not in the same directory as the binary.
+initial_guess = "./guess/"
+spectro_path = "./spectro"
+spectro_in_path = "./spectro.in"

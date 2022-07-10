@@ -29,11 +29,14 @@ lazy_static! {
     pub static ref TARGET: Target = Target::initialize(&get_target_path());
     pub static ref TOURNAMENT_SIZE: u32 = TARGET.tournament_size;
     pub static ref MUTATION_RATE: f64 = TARGET.mutation_rate;
+    pub static ref MUTATION_STRENGTH: f64 = TARGET.mutation_strength;
     pub static ref POPULATION_SIZE: i32 = TARGET.population_size;
     pub static ref FITNESS_THRESHOLD: f64 = TARGET.fitness_threshold;
     pub static ref NUMBER_ATOMS: i32 = TARGET.number_atoms;
     pub static ref INITIAL_GUESS: &'static str = TARGET.initial_guess.as_str();
     pub static ref EXE_DIR_PATH: PathBuf = get_executable_path();
+    pub static ref SPECTRO_PATH: String = TARGET.spectro_path.clone();
+            pub static ref SPECTRO_IN_PATH: String = TARGET.spectro_in_path.clone();
     // This is for the simple organisms.
     // #[derive(Clone, Copy)]
     // pub static ref TARGET: Target = Target::initialize(&PathBuf::from("/home/mvee/rust/fegenetics/tests/simple/target.toml"));
@@ -452,7 +455,7 @@ impl Organism for ForceOrganism {
                     continue;
                 }
                 if random_float(0.0, 1.0).abs() < *MUTATION_RATE {
-                    let norm_distr = Normal::new(*gene, 5e-8).unwrap();
+                    let norm_distr = Normal::new(*gene, *MUTATION_STRENGTH).unwrap();
                     *gene = norm_distr.sample(&mut rand::thread_rng());
 
                     check_and_fix_domain(Derivatives::from_index(i), gene)
@@ -544,7 +547,7 @@ impl ForceOrganism {
                 if (*gene - 0.0).abs() < 0.0000001 {
                     continue;
                 }
-                *gene += random_float(-0.01, 0.01);
+                *gene += random_float(-0.001, 0.001);
             }
         }
 
@@ -591,7 +594,7 @@ where
     // Each group will have TOURNAMENT_SIZE members.
     // We don't want a duplicate organism. We will generate a sequence from 0 to the pool size.
     // Then, we will shuffle the sequence and take the first TOURNAMENT_SIZE elements.
-    let mut v: Vec<u32> = (0..pool.len().try_into().unwrap()).collect();
+    let mut v: Vec<usize> = (0..pool.len()).collect();
     v.shuffle(&mut rand::thread_rng());
     for i in 0..*TOURNAMENT_SIZE {
         // Make sure it fits.
@@ -599,7 +602,7 @@ where
 
         // Is clone necessary?
         // Maybe there is a better way to do this with some sort of reference?
-        grp.push(pool[v[index] as usize].clone());
+        grp.push(pool[v[index]].clone());
     }
 
     // println!("The group is: {:?}\n", grp);
@@ -616,7 +619,7 @@ pub fn linear_interpolation(best: f64, worst: f64) -> Option<f64> {
     let mut dna = beta * (best - worst) + worst;
 
     // We need to make sure that the DNA is within the domain.
-    // If it is, we recursively call this function while reducing the beta.
+    // If it is not, we recursively call this function while reducing the beta.
     while dna.abs() < DOMAIN_LOWER || dna.abs() > DOMAIN_UPPER {
         beta = beta / 2.0;
         dna = beta * (best - worst) + worst;

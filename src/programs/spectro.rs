@@ -5,10 +5,7 @@ use std::sync::mpsc;
 use std::thread;
 use summarize::Summary;
 
-use crate::models::models::EXE_DIR_PATH;
-
-const SPECTRO_PATH: &str = "/home/mvee/rust/fegenetics/src/input/spectro";
-const SPECTRO_IN_PATH: &str = "/home/mvee/rust/fegenetics/src/input/spectro.in";
+use crate::models::models::{EXE_DIR_PATH, SPECTRO_IN_PATH, SPECTRO_PATH};
 
 /*
 Incase we need to do this ourselves and not use summarize.
@@ -51,11 +48,15 @@ pub fn run_spectro(organism_id: String) -> Result<Summary, Box<dyn Error>> {
         }
 
         // Get absolute path to SPECTRO_PATH.
-        let spectro_path = PathBuf::from(SPECTRO_PATH).canonicalize().unwrap();
-
+        let spectro_path = EXE_DIR_PATH
+            .join(SPECTRO_PATH.clone())
+            .canonicalize()
+            .unwrap();
         // Get absolute path to SPECTRO_IN_PATH.
-        let spectro_in_path = PathBuf::from(SPECTRO_IN_PATH).canonicalize().unwrap();
-
+        let spectro_in_path = EXE_DIR_PATH
+            .join(SPECTRO_IN_PATH.clone())
+            .canonicalize()
+            .unwrap();
         // Get current working directory.
         // let cwd = std::env::current_dir().unwrap();
 

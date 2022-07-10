@@ -3,6 +3,8 @@ use serde_derive::{Deserialize, Serialize};
 use std::io::Read;
 use std::path::PathBuf;
 
+use crate::models::models::{ForceOrganism, Organism};
+
 pub fn create_directory(path: &PathBuf) {
     if !path.exists() {
         match std::fs::create_dir_all(path) {
@@ -54,6 +56,21 @@ pub fn get_target_path() -> PathBuf {
     let mut path = get_executable_path();
     path.push("target.toml");
     path
+}
+
+// This function will iterate over a Vec<ForceOrganism> and determine how many
+// have fitness of f64::MAX.
+pub fn evalute_number_failed(organisms: &Vec<ForceOrganism>) -> i32 {
+    let mut number_failed = 0;
+    for organism in organisms.iter() {
+        if organism.harmfitness == f64::MAX
+            || organism.rotfitness == f64::MAX
+            || organism.fundfitness == f64::MAX
+        {
+            number_failed += 1;
+        }
+    }
+    number_failed
 }
 
 //Tests

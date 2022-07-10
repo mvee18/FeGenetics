@@ -1,6 +1,9 @@
-use crate::models::models::{
-    ForceOrganism, Organism, Population, EXE_DIR_PATH, FITNESS_THRESHOLD, NUMBER_ATOMS,
-    POPULATION_SIZE,
+use crate::{
+    models::models::{
+        ForceOrganism, Organism, Population, EXE_DIR_PATH, FITNESS_THRESHOLD, NUMBER_ATOMS,
+        POPULATION_SIZE,
+    },
+    utils::utils,
 };
 use std::time::Instant;
 
@@ -24,25 +27,14 @@ pub fn run_tga() {
 
         // Check if the best organism has a fitness of 1.0 or less.
         if best_organism.get_fitness() <= *FITNESS_THRESHOLD {
-            println!("Yes. The superior fighter is clear.");
+            println!("\nYes. The superior fighter is clear.");
             println!(
-                "Found solution in generation {}. The organism is {:?}.",
-                generation, best_organism
+                "Found solution in generation {}. The organism is {}.",
+                generation, best_organism.id
             );
             println!(
                 "The algorithm took {} seconds to run.",
                 start_time.elapsed().as_secs()
-            );
-            return;
-        }
-
-        if generation % 10 == 0 {
-            println!(
-                "Time taken: {:?} | Generation {} | Fitness {} | Best Organism {}",
-                Instant::now().duration_since(start_time),
-                generation,
-                best_organism.get_fitness(),
-                best_organism.id
             );
             let best_path = &EXE_DIR_PATH
                 .join("best")
@@ -50,6 +42,71 @@ pub fn run_tga() {
                 .join(format!("{}", best_organism.id));
 
             best_organism.save_to_file(best_path, true);
+
+            // let mut parameter_file =
+            //     std::fs::File::create(EXE_DIR_PATH.join("best").join("parameter.out"))
+            //         .expect("Error creating parameter.out file.");
+
+            // Write the parameters to the file.
+            // parameter_file
+            //     .write_all(
+            //         format!(
+            //             "Generation: {}\nFitness: {}\nBest Organism: {}\nNumber Unfit: {}\nTournament Size: {}\nMutation Rate: {}\nStrength: {}\n",
+            //             generation,
+            //             "CONVERGED",
+            //             best_organism.id,
+            //             utils::evalute_number_failed(&population.clone()),
+            //             *TOURNAMENT_SIZE,
+            //             *MUTATION_RATE,
+            //             *MUTATION_STRENGTH,
+            //         )
+            //         .as_bytes(),
+            //     )
+            //     .unwrap();
+
+            return;
+        }
+
+        if generation % 10 == 0 {
+            println!(
+                "Time taken: {:?} | Generation {} | Fitness {} | Best Organism {} | Number Unfit: {}",
+                Instant::now().duration_since(start_time),
+                generation,
+                best_organism.get_fitness(),
+                best_organism.id,
+                utils::evalute_number_failed(&population.clone())
+            );
+            let best_path = &EXE_DIR_PATH
+                .join("best")
+                .join(format!("{}", generation))
+                .join(format!("{}", best_organism.id));
+
+            best_organism.save_to_file(best_path, true);
+
+            // Open a parameter.out file and write the parameters to it.
+            // let mut parameter_file =
+            //     std::fs::File::create(EXE_DIR_PATH.join("best").join("parameter.out"))
+            //         .expect("Error creating parameter.out file.");
+
+            // // Write the parameters to the file.
+
+            // parameter_file
+            //     .write_all(
+            //         format!(
+            //             "Generation: {}\nFitness: {}\nBest Organism: {}\nNumber Unfit: {}\nTournament Size: {}\nMutation Rate: {}\nStrength: {}\n",
+            //             generation,
+            //             best_organism.get_fitness(),
+            //             best_organism.id,
+            //             utils::evalute_number_failed(&population.clone()),
+            //             *TOURNAMENT_SIZE,
+            //             *MUTATION_RATE,
+            //             *MUTATION_STRENGTH,
+            //         )
+            //         .as_bytes(),
+            //     )
+            //     .unwrap();
+
+            // return;
         }
 
         // Otherwise, we eliminiate the worst half of the population
