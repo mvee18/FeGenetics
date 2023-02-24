@@ -1,0 +1,1400 @@
+
+ ************************************************************
+                      PROGRAM SPECTRO 
+    SPECTROSCOPIC CONSTANTS AND VIBRATIONAL PROPERTIES
+
+             WRITTEN BY:  JEFFREY F. GAW 
+                    AND  ANDREW WILLETTS 
+
+
+  RUNNING IN:  CARTESIAN --> NORMAL --> INTERNAL COORD MODE
+ ************************************************************
+
+ NCART    =    1
+ ISOTOP   =    0
+ NBOND    =    2
+ NBEND    =    1
+ 2*NLBEND =    0
+ NOFPB    =    0
+ NTORS    =    0
+ NDERIV   =    4
+ ISYMM    =    0
+ ICURVQ   =    0
+ IDEGNL   =    0
+ IFREQ    =    0
+ IPRNT    =    0
+ NWFRQ    =    0
+ NPROP    =    0
+ ICORIL   =    0
+ IFERM1   =    0
+ IFERM2   =    0
+ IROTRN   =    0
+ ILSQRS   =    0
+ IAVERG   =    1
+ IREP     =    0
+ IPARMF   =    0
+ IPARMD   =    0
+ IGEOM    =    0
+ ITEMP    =  300
+ IDARL    =    0
+ MAXJ     =    3
+ INORM    =    0
+ <>
+ ISOTOPE #            1
+
+          --- INPUT GEOMETRY IN BOHR
+
+
+  GEOMETRY ANALYSIS - 1. INITIAL GEOMETRY
+                      2. MOVE TO PRINCIPAL AXES
+                      3. ROTATE ATOM TO X-AXIS
+                         (SYMMETRIC TOP ONLY)
+
+
+****************************************
+ ORIGINAL COORDINATE REPRESENTATION 
+****************************************
+
+
+   MOLECULAR CARTESIAN GEOMETRY (IN A)
+
+ATOM NO.               X              Y              Z              W
+    1              0.0000000      0.7574256      0.5217872      1.0078250
+    2              0.0000000      0.0000000     -0.0657379     15.9949146
+    3              0.0000000     -0.7574256      0.5217872      1.0078250
+
+   CENTER OF MASS COORDINATES
+
+           CMX            CMY            CMZ
+        0.0000000      0.0000000      0.0000149
+
+   CARTESIAN COORDINATES W.R.T. CENTER OF MASS
+
+ATOM NO.               X              Y              Z              W
+    1              0.0000000      0.7574256      0.5217723      1.0078250
+    2              0.0000000      0.0000000     -0.0657528     15.9949146
+    3              0.0000000     -0.7574256      0.5217723      1.0078250
+
+   INERTIA TENSOR
+
+             1           2           3
+  ------------------------------------------
+   1     1.7742717
+   2     0.0000000   0.6179063
+   3     0.0000000   0.0000000   1.1563655
+
+   EIGENVECTORS OF INERTIA TENSOR
+
+              1           2           3
+   ------------------------------------------
+    1    0.00000000  0.00000000  1.00000000
+    2   -1.00000000  0.00000000  0.00000000
+    3    0.00000000  1.00000000  0.00000000
+
+   PRINCIPAL MOMENTS OF INERTIA
+
+              IN AMU.A+2        IN G.CM+2         IN CM-1           IN MHZ
+                                (*D+39)
+   1          0.61791D+00       0.10261D+00       0.27282D+02       0.81789D+06
+   2          0.11564D+01       0.19202D+00       0.14578D+02       0.43704D+06
+   3          0.17743D+01       0.29463D+00       0.95012D+01       0.28484D+06
+
+**************************************************
+ COORDINATE SYSTEM ABOUT PRINCIPAL AXES 
+**************************************************
+
+
+   MOLECULAR PRINCIPAL GEOMETRY (IN A)
+
+ATOM NO.               A              B              C              W
+    1             -0.7574256      0.5217723      0.0000000      1.0078250
+    2              0.0000000     -0.0657528      0.0000000     15.9949146
+    3              0.7574256      0.5217723      0.0000000      1.0078250
+
+   CENTER OF MASS COORDINATES
+
+           CMX            CMY            CMZ
+        0.0000000      0.0000000      0.0000000
+
+   INERTIA TENSOR
+
+             1           2           3
+  ------------------------------------------
+   1     0.6179063
+   2     0.0000000   1.1563655
+   3     0.0000000   0.0000000   1.7742717
+
+ INTERNUCLEAR DISTANCE MATRIX (IN A)
+
+             1           2           3
+  ------------------------------------------
+   1     0.0000000
+   2     0.9585819   0.0000000
+   3     1.5148512   0.9585819   0.0000000
+
+   BOND ANGLES (CENTRAL ATOM FIRST)
+
+   J   I   K    DEGREES     I   J   K    DEGREES    K   I   J    DEGREES   
+
+   2   1   3    104.399     1   2   3     37.800    3   1   2     37.800
+ <>
+
+          ------------------------------------------------------------
+                             MEMORY ALLOCATION SCHEME 
+          ------------------------------------------------------------
+
+ INTEGER DEFAULT ALLOCATION
+   ALLOCATION: BLOCK START-     1   FINISH-    92   TOTAL-    91
+
+ REAL DEFAULT ALLOCATION
+   ALLOCATION: BLOCK START-    92   FINISH- 19762   TOTAL- 19670
+
+ CUBIC AND QUARTIC ALLOCATION
+   ALLOCATION: BLOCK START- 19762   FINISH- 20872   TOTAL-  1110
+
+   ALLOCATION: BLOCK START- 20872   FINISH- 20990   TOTAL-   118
+
+ VIBFX ALLOCATION
+   ALLOCATION: BLOCK START- 20990   FINISH- 21224   TOTAL-   234
+
+ LTENSR ALLOCATION
+   ALLOCATION: BLOCK START- 20990   FINISH- 21159   TOTAL-   169
+
+ SQHAMP ALLOCATION
+   ALLOCATION: BLOCK START- 20990   FINISH- 21017   TOTAL-    27
+
+ UMATRX ALLOCATION
+   ALLOCATION: BLOCK START- 20990   FINISH- 21056   TOTAL-    66
+
+ ZETA ALLOCATION
+   ALLOCATION: BLOCK START- 20990   FINISH- 21083   TOTAL-    93
+
+ TRNSFM ALLOCATION
+   ALLOCATION: BLOCK START- 21224   FINISH- 21378   TOTAL-   154
+
+ FORCE3/FORCE4 ALLOCATION
+   ALLOCATION: BLOCK START- 21378   FINISH- 21636   TOTAL-   258
+
+ XCALC/XCALS ALLOCATION
+   ALLOCATION: BLOCK START- 21378   FINISH- 21384   TOTAL-     6
+
+ ROTA/ROTS ALLOCATION
+   ALLOCATION: BLOCK START- 21378   FINISH- 21630   TOTAL-   252
+
+ INTEN ALLOCATION
+   ALLOCATION: BLOCK START- 21636   FINISH- 21636   TOTAL-     0
+
+ DIPTRN ALLOCATION
+   ALLOCATION: BLOCK START- 21636   FINISH- 21770   TOTAL-   134
+
+ ATUNIT ALLOCATION
+   ALLOCATION: BLOCK START- 21770   FINISH- 24662   TOTAL-  2892
+
+ ITERATE ALLOCATION
+   ALLOCATION: BLOCK START- 24662   FINISH- 32393   TOTAL-  7731
+
+ RAMANQ ALLOCATION
+   ALLOCATION: BLOCK START- 32393   FINISH- 32393   TOTAL-     0
+
+ INTENR ALLOCATION
+   ALLOCATION: BLOCK START- 32393   FINISH- 32393   TOTAL-     0
+
+ HRAMAN ALLOCATION
+   ALLOCATION: BLOCK START- 32393   FINISH- 32393   TOTAL-     0
+
+ 3RD DERIVATIVE TRANSFORM
+   ALLOCATION: BLOCK START- 32393   FINISH- 32603   TOTAL-   210
+
+ FOURTH DERIVATIVE TRANSFORM
+   ALLOCATION: BLOCK START- 32603   FINISH- 33068   TOTAL-   465
+
+ ICURVQ ALLOCATION
+   ALLOCATION: BLOCK START- 33068   FINISH- 33154   TOTAL-    86
+
+ LSQRS ALLOCATION
+   ALLOCATION: BLOCK START- 33154   FINISH- 33295   TOTAL-   141
+
+ TMATRX ALLOCATION
+   ALLOCATION: BLOCK START- 33295   FINISH- 33331   TOTAL-    36
+
+ SEXTIC ALLOCATION
+   ALLOCATION: BLOCK START- 33331   FINISH- 33430   TOTAL-    99
+
+ WCALS ALLOCATION
+   ALLOCATION: BLOCK START- 33430   FINISH- 33439   TOTAL-     9
+
+
+   INTEGER MEMORY REQUIRED -      92 Word   ALLOCATED - 3500000 Word
+
+
+   REAL MEMORY REQUIRED    -   33348 Word   ALLOCATED -******** Word
+
+  *** FILE           15  IS IN SPECTRO 1.x FORMAT ***
+
+
+   THE NORMAL COORDINATE ANALYSIS BY FX MATRIX METHOD
+
+
+
+   SECULAR EQUATIONS
+   FXM MATRIX
+
+             1           2           3           4           5           6           7           8           9
+  ------------------------------------------------------------------------------------------------------------------
+   1     6.3343449
+   2     0.0000000   0.0000000
+   3    -2.9963815   0.0000000   2.4112200
+   4    -1.6037946   0.0000000   0.5560683   0.4700360
+   5     0.0000000   0.0000000   0.0000000   0.0000000   0.0000000
+   6     0.8189236   0.0000000  -0.5158647  -0.0777428   0.0000000   0.5941018
+   7     0.0548649   0.0000000   0.7811123  -0.2687385   0.0000000  -0.5092113   1.0157378
+   8     0.0000000   0.0000000   0.0000000   0.0000000   0.0000000   0.0000000   0.0000000   0.0000000
+   9    -0.2660526   0.0000000  -0.3561140  -0.2463560   0.0000000  -1.8509228   1.2474878   0.0000000   7.7298351
+
+
+   *****************************
+   ***VIBRATIONAL FREQUENCIES***
+   *****************************
+
+
+   LXM MATRIX
+
+             1           2           3           4           5           6           7           8           9
+           3846.66     3719.10     1692.41        0.03        0.00        0.00        0.00        0.00        0.01
+  ------------------------------------------------------------------------------------------------------------------
+   1    -0.6109407   0.5983056  -0.3108068   0.4141546   0.0000002   0.0000000   0.0000000   0.0000000   0.0256318
+   2     0.0000000   0.0000000   0.0000000   0.0000000   0.0000000   1.0000000   0.0000000   0.0000000   0.0000000
+   3     0.3008857  -0.3509567  -0.6052267   0.4735183  -0.2249198   0.0000000   0.0000000  -0.0732658   0.3739271
+   4     0.1167432  -0.1749945   0.2454292   0.6516706  -0.0000020   0.0000000   0.0000000   0.0000000  -0.6861762
+   5     0.0000000   0.0000000   0.0000000   0.0000000   0.0000000   0.0000000   1.0000000   0.0000000   0.0000000
+   6    -0.2425060  -0.0842430   0.1181499  -0.1404983  -0.8960433   0.0000000   0.0000000  -0.2918771  -0.1109456
+   7     0.1458583   0.0988390  -0.6669362  -0.3903990  -0.0000021   0.0000000   0.0000000   0.0000000  -0.6097056
+   8     0.0000000   0.0000000   0.0000000   0.0000001  -0.3097225   0.0000000   0.0000000   0.9508270   0.0000010
+   9     0.6652116   0.6865644   0.1345400   0.0862014  -0.2249210   0.0000000   0.0000000  -0.0732659   0.0680719
+
+
+   LX MATRIX
+
+             1           2           3           4           5           6           7           8           9
+           3846.66     3719.10     1692.41        0.03        0.00        0.00        0.00        0.00        0.01
+  ------------------------------------------------------------------------------------------------------------------
+   1    -0.6085644   0.5959783  -0.3095978   0.4125436   0.0000002   0.0000000   0.0000000   0.0000000   0.0255321
+   2     0.0000000   0.0000000   0.0000000   0.0000000   0.0000000   0.9961103   0.0000000   0.0000000   0.0000000
+   3     0.2997153  -0.3495916  -0.6028725   0.4716764  -0.2240450   0.0000000   0.0000000  -0.0729808   0.3724726
+   4     0.0291904  -0.0437556   0.0613671   0.1629436  -0.0000005   0.0000000   0.0000000   0.0000000  -0.1715713
+   5     0.0000000   0.0000000   0.0000000   0.0000000   0.0000000   0.0000000   0.2500397   0.0000000   0.0000000
+   6    -0.0606361  -0.0210641   0.0295422  -0.0351302  -0.2240464   0.0000000   0.0000000  -0.0729809  -0.0277408
+   7     0.1452910   0.0984545  -0.6643420  -0.3888805  -0.0000021   0.0000000   0.0000000   0.0000000  -0.6073341
+   8     0.0000000   0.0000000   0.0000000   0.0000001  -0.3085177   0.0000000   0.0000000   0.9471286   0.0000010
+   9     0.6626241   0.6838939   0.1340167   0.0858661  -0.2240461   0.0000000   0.0000000  -0.0729809   0.0678072
+
+ ******************************** 
+ CURVILINEAR INTERNAL COORDINATES 
+ ******************************** 
+
+ INT COORD NO.    DESCRIPTION           VALUE      ATOMS 
+
+     ( 1)        BOND                        0.95858       1(H )     2(O )
+     ( 2)        BOND                        0.95858       2(O )     3(H )
+     ( 3)        ANGLE                     104.39947       2(O )     1(H )     3(H )
+
+ FIRST DERIVATIVE OF THE L TENSOR :
+ ROWS ARE INT COORDS AND COLUMNS ARE NORMAL COORDS
+
+              1           2           3
+   ------------------------------------------
+    1    0.50392335 -0.50548716  0.29311870
+    2    0.09173708  0.11236762 -0.57342059
+    3    0.48200991 -0.31811331 -0.22682099
+
+******************************************
+ MEAN SQUARE HARMONIC AMPLITUDES AT 30 K
+******************************************
+
+
+ MATRIX OF MEAN SQUARE AMPLITUDES BETWEEN INTERNAL
+ COORDINATES: BONDS IN A, ANGLES IN RADS 
+
+              1           2           3
+   ------------------------------------------
+    1    0.00312686 -0.00172907  0.00113110
+    2   -0.00172907  0.00336931  0.00132729
+    3    0.00113110  0.00132729  0.00198933
+
+******************************************
+ MEAN SQUARE HARMONIC AMPLITUDES AT 300 K
+******************************************
+
+
+ MATRIX OF MEAN SQUARE AMPLITUDES BETWEEN INTERNAL
+ COORDINATES: BONDS IN A, ANGLES IN RADS 
+
+              1           2           3
+   ------------------------------------------
+    1    0.00312737 -0.00173007  0.00113070
+    2   -0.00173007  0.00337127  0.00132806
+    3    0.00113070  0.00132806  0.00198964
+
+ ZETA MATRIX FOR COORDINATE DIRECTION :   1
+
+              1           2           3
+   ------------------------------------------
+    1    0.00000000  0.00000000  0.00000000
+    2    0.00000000  0.00000000  0.00000000
+    3    0.00000000  0.00000000  0.00000000
+
+ ZETA MATRIX FOR COORDINATE DIRECTION :   2
+
+              1           2           3
+   ------------------------------------------
+    1    0.00000000 -0.01651244 -0.99986366
+    2    0.01651244  0.00000000 -0.00000233
+    3    0.99986366  0.00000233  0.00000000
+
+ ZETA MATRIX FOR COORDINATE DIRECTION :   3
+
+              1           2           3
+   ------------------------------------------
+    1    0.00000000  0.00000000  0.00000000
+    2    0.00000000  0.00000000  0.00000000
+    3    0.00000000  0.00000000  0.00000000
+
+ THE WILSON A MATRIX IN AMU 1/2 A 
+ (ROWS ARE VIB DEG OF FREEDOM, AND COLS COORD PRODUCTS),
+
+              1           2           3           4           5           6
+   ------------------------------------------------------------------------------
+    1    0.00000000  0.00000000  1.15091469 -0.55405462 -1.13964570  1.15091469
+    2    0.00000000  0.00000000 -0.75957211 -1.57782744 -0.39589589 -0.75957211
+    3    0.00000000  0.00000000 -0.54158971 -1.12501253  0.55524019 -0.54158971
+
+ THE INVERSE L MATRIX
+
+              1           2           3
+   ------------------------------------------
+    1  ************************************
+    2  ************************************
+    3  ************************************
+
+ THE WILSON J MATRIX 
+ DERIVATIVE OF THE MOMENT OF INERITA WITH RESPECT TO INT/SYMM COORDS
+ (ROWS ARE INTERNAL/SYMMETRY COORD AND COLS COORD PRODUCTS),
+
+              1           2           3           4           5           6
+   ------------------------------------------------------------------------------
+    1    8.29381636-12.03963623 16.33593750************************ 43.62304688
+    2    8.29381636-12.03963623  0.42968750************************ 27.72460938
+    3  -10.24937070 14.87839728-12.43750000************************-46.14843750
+
+                 ************* ERROR IN SUM RULES *************
+                           SEE ERROR FILE FOR DETAILS
+
+ QUARTIC CENTRIFUGAL DISTORTION CONSTANTS TAU PRIME 
+
+                       CM -1                    MHz
+
+
+ TAUP aaaa          0.0000000000             0.0000000000
+ TAUP bbbb         -0.0025044777           -75.0823521179
+ TAUP cccc         -0.0004518737           -13.5468326296
+
+ TAUP aabb          0.0000000000             0.0000000000
+ TAUP aacc         -0.0204949604          -614.4234562249
+ TAUP bbcc         -0.0029465066           -88.3340448754
+
+ REPRESENTATION =     1
+ WHERE :   1 =   I r
+           2 =  II r 
+           3 = III r 
+           4 =   I l 
+           5 =  II l 
+           6 = III l 
+
+ lifnei
+
+ ASYMMETRIC TOP REDUCTION 
+  ASYMMETRIC TOP PARAMETER KAPPA :  -0.4289357118
+  ASYMMETRIC TOP PARAMETER SIGMA :        6.0044653163
+
+
+ CONSTANTS IN THE A REDUCED HAMILTONIAN 
+
+                   CM-1               MHz
+  DELTA J  :   0.0003695439       11.0786480934
+  DELTA K  :  -0.0051212789     -153.5320790882
+  DELTA JK :   0.0047517350      142.4534309948
+  delta J  :   0.0001282877        3.8459699680
+  delta K  :  -0.0037922255     -113.6880614698
+
+
+ EFFECTIVE ROTATIONAL CONSTANTS (INCLUDES DISTORTION
+ DUE TO THE QUARTIC CENTRIFUGAL DISTORTION CONSTANTS)
+           B e IN CM-1            B(A) IN  CM-1            B(A) IN  MHz
+ x        14.5781165739           14.5755453558             436963.85689
+ y         9.5011547712            9.5029918239             284892.52772
+ z        27.2818562010           27.2825903665             817911.48266
+
+
+ NIELSEN CENTRIFUGAL DISTORTION CONSTANTS 
+           CM-1                MHz
+ DJ    0.0004613146       13.8298638748
+ DJK   0.0042011109      125.9461363067
+ DK   -0.0046624255     -139.7760001814
+ dJ    0.0001282877        3.8459699680
+ R5    0.0013450789       40.3244509981
+ R6    0.0000458853        1.3756078907
+
+ CONSTANTS IN THE S REDUCED HAMILTONIAN 
+
+               CM-1                 MHz
+  D J  :   0.0006853277       20.5456077210
+  D JK :   0.0028570323       85.6516732291
+  D K  :  -0.0035423600     -106.1972809502
+  d 1  :  -0.0001282877       -3.8459699680
+  d 2  :   0.0001578919        4.7334798138
+
+
+ EFFECTIVE ROTATIONAL CONSTANTS (INCLUDES DISTORTION
+ DUE TO THE QUARTIC CENTRIFUGAL DISTORTION CONSTANTS)
+           B e IN CM-1            B(S) IN  CM-1            B(S) IN  MHz
+ x        14.5781165739           14.5837613744             437210.16693
+ y         9.5011547712            9.4960389404             284684.08552
+ z        27.2818562010           27.2810114476             817864.14786
+
+
+ WILSON CENTRIFUGAL DISTORTION CONSTANTS 
+           CM-1                MHz
+ DJ    0.0001129684        3.3867081574
+ DJK   0.0012473164       37.3936061229
+ DK   -0.0007341654      -22.0097262508
+
+ NIELSEN CENTRIFUGAL DISTORTION CONSTANTS 
+           CM-1                MHz
+ DJ    0.0004613146       13.8298638748
+ DJK   0.0042011109      125.9461363067
+ DK   -0.0046624255     -139.7760001814
+ dJ    0.0001282877        3.8459699680
+ R5    0.0013450789       40.3244509981
+ R6    0.0000458853        1.3756078907
+
+ TEST OF QUARTIC PLANARITY RELATIONS 
+  A REDUCTION   I r
+
+ 4C*DELJ - (B-C)*DELJK - 2*(2A+B+C)*SDELJ + 2*(B-C)*SDELK = 0
+ VALUE =        -0.0687638321
+
+ TEST OF QUARTIC PLANARITY RELATIONS 
+  S REDUCTION   I r
+
+ 4C*DJ - (B-C)*DJK + 2*(2A+B+C)*D1 - 4*(4A+B-3C)*D2 = 0
+ VALUE =        -0.0687638321
+  *** FILE           30  IS IN SPECTRO 1.x FORMAT ***
+
+
+   *************************************************
+   ***THIRD DERIVATIVES W.R.T. NORMAL COORDINATES***
+   *************************************************
+
+
+   F3(QI*QJ*QK) MATRIX (IN CM-1), IVIB =     1
+
+             1           2           3
+  ------------------------------------------
+   1        -0.001   -1715.146     441.033
+   2     -1715.146       0.000       0.000
+   3       441.033       0.000       0.003
+
+
+   F3(QI*QJ*QK) MATRIX (IN CM-1), IVIB =     2
+
+             1           2           3
+  ------------------------------------------
+   1     -1715.146       0.000       0.000
+   2         0.000   -1716.491     257.555
+   3         0.000     257.555     540.068
+
+
+   F3(QI*QJ*QK) MATRIX (IN CM-1), IVIB =     3
+
+             1           2           3
+  ------------------------------------------
+   1       441.033       0.000       0.003
+   2         0.000     257.555     540.068
+   3         0.003     540.068   -1295.365
+
+
+   THE FOURTH ORDER ANHARMONICITY ANALYSIS
+
+  *** FILE           40  IS IN SPECTRO 1.x FORMAT ***
+
+
+   **************************************************
+   ***FOURTH DERIVATIVES W.R.T. NORMAL COORDINATES***
+   **************************************************
+
+
+
+   F4(QI*QJ*QK*QL) MATRIX (IN CM-1), IVIB =     1      JVIB =     1
+
+             1           2           3
+  ------------------------------------------
+   1     -1228.391       0.000      -0.002
+   2         0.000     668.016   -2286.361
+   3        -0.002   -2286.361   -1355.711
+
+
+   F4(QI*QJ*QK*QL) MATRIX (IN CM-1), IVIB =     2      JVIB =     1
+
+             1           2           3
+  ------------------------------------------
+   1         0.000     668.016   -2286.361
+   2       668.016      -0.001       0.000
+   3     -2286.361       0.000      -0.002
+
+
+   F4(QI*QJ*QK*QL) MATRIX (IN CM-1), IVIB =     2      JVIB =     2
+
+             1           2           3
+  ------------------------------------------
+   1       668.016      -0.001       0.000
+   2        -0.001     329.997   -3286.850
+   3         0.000   -3286.850   -3149.602
+
+
+   F4(QI*QJ*QK*QL) MATRIX (IN CM-1), IVIB =     3      JVIB =     1
+
+             1           2           3
+  ------------------------------------------
+   1        -0.002   -2286.361   -1355.711
+   2     -2286.361       0.000      -0.002
+   3     -1355.711      -0.002       0.006
+
+
+   F4(QI*QJ*QK*QL) MATRIX (IN CM-1), IVIB =     3      JVIB =     2
+
+             1           2           3
+  ------------------------------------------
+   1     -2286.361       0.000      -0.002
+   2         0.000   -3286.850   -3149.602
+   3        -0.002   -3149.602    2322.666
+
+
+   F4(QI*QJ*QK*QL) MATRIX (IN CM-1), IVIB =     3      JVIB =     3
+
+             1           2           3
+  ------------------------------------------
+   1     -1355.711      -0.002       0.006
+   2        -0.002   -3149.602    2322.666
+   3         0.006    2322.666   15880.290
+
+ *************************************************
+ QUADRATIC FORCE CONSTANTS IN INTERNAL COORDINATES
+ *************************************************
+
+             1           2           3
+  ------------------------------------------
+   1  ************
+   2  ************************
+   3  ************************************
+
+ *********************************************
+ CUBIC FORCE CONSTANTS IN INTERNAL COORDINATES
+ *********************************************
+
+
+ INT COORD  INT COORD  INT COORD     VALUE
+
+     1          1          1       **********
+     2          1          1       **********
+     2          2          1       **********
+     2          2          2       **********
+     3          1          1       **********
+     3          2          1       **********
+     3          2          2       **********
+     3          3          1       **********
+     3          3          2       **********
+     3          3          3       **********
+ I J K L           1           1           1           1
+ IJKL FRQ4 VALUES VALUE           1  -317.640103925879     
+  2.948814802514660E+034 -1.395937627166916E+017
+ I J K L           2           1           1           1
+ IJKL FRQ4 VALUES VALUE           2 -7.786983413427331E-005
+ -6.331340243609295E+033  7.180931054743366E+016
+ I J K L           2           2           1           1
+ IJKL FRQ4 VALUES VALUE           3   167.008474002135     
+ -1.415878184409915E+034  2.327060858258872E+018
+ I J K L           2           2           2           1
+ IJKL FRQ4 VALUES VALUE           4 -1.607528147219220E-004
+ -2.187250175828766E+032 -4.930153507794758E+017
+ I J K L           2           2           2           2
+ IJKL FRQ4 VALUES VALUE           5   79.7654946297361     
+ -3.887055905758162E+034 -2.537912058365034E+018
+ I J K L           3           1           1           1
+ IJKL FRQ4 VALUES VALUE           6 -3.365482418657834E-004
+ -2.260999736460379E+034  1.088018066617636E+018
+ I J K L           3           2           1           1
+ IJKL FRQ4 VALUES VALUE           7  -385.594453303217     
+  5.470759403892082E+034 -2.175070784656343E+018
+ I J K L           3           2           2           1
+ IJKL FRQ4 VALUES VALUE           8 -6.108178304431444E-005
+ -1.947197817529775E+033  1.810436451158275E+018
+ I J K L           3           2           2           2
+ IJKL FRQ4 VALUES VALUE           9  -535.943827552679     
+  8.316351151222867E+034 -9.893308209121656E+017
+ I J K L           3           3           1           1
+ IJKL FRQ4 VALUES VALUE          10  -154.236439855723     
+ -1.439110476317449E+035 -2.299845942706520E+018
+ I J K L           3           3           2           1
+ IJKL FRQ4 VALUES VALUE          11 -2.670626605438750E-004
+ -1.545085934721624E+034 -3.729880798141997E+017
+ I J K L           3           3           2           2
+ IJKL FRQ4 VALUES VALUE          12  -346.440780451160     
+ -1.512126936519068E+035 -1.009174577577194E+017
+ I J K L           3           3           3           1
+ IJKL FRQ4 VALUES VALUE          13  4.529925494028099E-004
+  9.261817566071750E+034  2.105569474457339E+018
+ I J K L           3           3           3           2
+ IJKL FRQ4 VALUES VALUE          14   172.343200216898     
+  2.738160304203579E+035  1.314749682852313E+018
+ I J K L           3           3           3           3
+ IJKL FRQ4 VALUES VALUE          15   794.876700794856     
+ -5.926191637681728E+035 -4.802877913972317E+018
+
+ ***********************************************
+ QUARTIC FORCE CONSTANTS IN INTERNAL COORDINATES
+ ***********************************************
+
+
+ INT COORD  INT COORD  INT COORD  INT COORD   VALUE
+
+     1          1          1          1      **********
+     2          1          1          1      **********
+     2          2          1          1      **********
+     2          2          2          1      **********
+     2          2          2          2      **********
+     3          1          1          1      **********
+     3          2          1          1      **********
+     3          2          2          1      **********
+     3          2          2          2      **********
+     3          3          1          1      **********
+     3          3          2          1      **********
+     3          3          2          2      **********
+     3          3          3          1      **********
+     3          3          3          2      **********
+     3          3          3          3      **********
+
+ HARMONIC POTENTIAL ENERGY DISTRIBUTION 
+ (ROWS ARE INT/SYMM COORD AND COLS NORMAL COORDS)
+
+             1           2           3
+           3846.66     3719.10     1692.41
+  ------------------------------------------
+   1  ************************************
+   2  ************************************
+   3  ************************************
+
+
+ *******************
+  RESONANCE TESTING
+ *******************
+
+ TOLERANCES FOR RESONANCE TESTING 
+ CTOL  =    200.000
+ ZTOL  =      0.250
+ FTOL1 =    200.000
+ F3TOL =     10.000
+ DLTOL =   1000.000
+ DFTOL =    200.000
+ DDTOL =    300.000
+
+
+ ***********************************************************
+               CORIOLIS RESONANCES          WI = WJ
+ ***********************************************************
+        I    J      WI        WJ       DIFF     ZETA  DeltaALPHA
+
+  NO MODES FOUND TO BE IN CORIOLIS RESONANCE 
+
+
+ *******************************************************************************
+       FERMI RESONANCE           TYPE 1          2WI = WJ
+ *******************************************************************************
+     I  I    J       WI         WJ         DIFF      PHI IIJ  EST.PERTURB.
+
+  THIS TYPE OF FERMI RESONANCE NOT FOUND 
+
+
+ *******************************************************************************
+          FERMI RESONANCE           TYPE 2          WA = WB + WC
+ *******************************************************************************
+     I  J  K       WI        WJ        WK        PHI IJK   WJ+WK-WI  EST.PERTRB.
+
+  THIS TYPE OF FERMI RESONANCE NOT FOUND 
+
+
+ *****************************************************
+     DARLING-DENNISON RESONANCES          2WI = 2WJ
+ *****************************************************
+    I      J      WI         WJ         DIFF
+
+    2      1   3719.10    3846.66     255.13
+ <>
+
+ T  MATRIX  (COEFFS OF q2J2 OPERATORS) IN CM-1 
+
+
+ AXES :  IXYZ =    1 JXYZ =    1
+             1           2           3
+  ------------------------------------------
+   1     0.0502158
+   2     0.1454355   0.4212119
+   3     0.1537214   0.4452095   0.4705744
+
+ AXES :  IXYZ =    2 JXYZ =    1
+             1           2           3
+  ------------------------------------------
+   1     0.0551931
+   2     0.0896751   0.0564741
+   3     0.0642090  -0.0288606  -0.1241022
+
+ AXES :  IXYZ =    2 JXYZ =    2
+             1           2           3
+  ------------------------------------------
+   1     0.6795433
+   2    -0.3454577   0.1855936
+   3     0.0015524   0.2755439  -0.1090334
+
+ AXES :  IXYZ =    3 JXYZ =    1
+             1           2           3
+  ------------------------------------------
+   1     0.1781936
+   2     0.1375976   0.4179076
+   3    -0.1093311   0.8584173   0.8455749
+
+ AXES :  IXYZ =    3 JXYZ =    2
+             1           2           3
+  ------------------------------------------
+   1     0.0541254
+   2     0.2117411   0.1444641
+   3    -0.0001630  -0.2642225  -0.3216444
+
+ AXES :  IXYZ =    3 JXYZ =    3
+             1           2           3
+  ------------------------------------------
+   1     0.1192699
+   2    -0.0818000   0.2216890
+   3     0.0540432   0.2887062   0.3269776
+
+ ALPHA MATRIX FOR ASYMMETRIC TOP MOLECULES
+
+
+ROTATIONAL CONSTANTS IN CM-1 (MHz) 
+
+       27.2818562010       14.5781165739        9.5011547712
+       (   817889.47 )      (   437040.94 )      (   284837.45 ) 
+
+ ALPHA FOR PRINCIPAL AXIS  A  IN CM-1   (MHZ) 
+ (Be =   27.28186 IN CM-1)
+
+    1       -0.0502157714          ( -1505.431 )
+    2       -0.4212118789          (-12627.614 )
+    3       -0.4705744184          (-14107.466 )
+
+ ALPHA FOR PRINCIPAL AXIS  B  IN CM-1   (MHZ) 
+ (Be =   14.57812 IN CM-1)
+
+    1       -0.6795433427          (-20372.197 )
+    2       -0.1855936072          ( -5563.956 )
+    3        0.1090333904          (  3268.739 )
+
+ ALPHA FOR PRINCIPAL AXIS  C  IN CM-1   (MHZ) 
+ (Be =    9.50115 IN CM-1)
+
+    1       -0.1192698679          ( -3575.621 )
+    2       -0.2216890498          ( -6646.071 )
+    3       -0.3269775543          ( -9802.540 )
+
+ VIBRATIONAL CORRECTIONS TO THE ROTATIONAL CONSTANTS
+
+
+                                ********
+                                 AXIS A 
+                                ********
+
+ CORRECTION       (MHz)     BVA IN CM-1     BVA IN MHz               VIBRATIONAL STATE 
+
+  0.4710010    14120.256     27.7528572     832009.729     NON-DEG (Vs) :    0    0    0
+
+  0.5212168    15625.687     27.8030730     833515.160     NON-DEG (Vs) :    1    0    0
+
+  0.8922129    26747.870     28.1740691     844637.343     NON-DEG (Vs) :    0    1    0
+
+  0.9415755    28227.722     28.2234317     846117.195     NON-DEG (Vs) :    0    0    1
+
+                                ********
+                                 AXIS B 
+                                ********
+
+ CORRECTION       (MHz)     BVB IN CM-1     BVB IN MHz               VIBRATIONAL STATE 
+
+  0.3780518    11333.707     14.9561684     448374.647     NON-DEG (Vs) :    0    0    0
+
+  1.0575951    31705.904     15.6357117     468746.844     NON-DEG (Vs) :    1    0    0
+
+  0.5636454    16897.664     15.1417620     453938.604     NON-DEG (Vs) :    0    1    0
+
+  0.2690184     8064.968     14.8471350     445105.908     NON-DEG (Vs) :    0    0    1
+
+                                ********
+                                 AXIS C 
+                                ********
+
+ CORRECTION       (MHz)     BVC IN CM-1     BVC IN MHz               VIBRATIONAL STATE 
+
+  0.3339682    10012.116      9.8351230     294849.570     NON-DEG (Vs) :    0    0    0
+
+  0.4532381    13587.737      9.9543929     298425.191     NON-DEG (Vs) :    1    0    0
+
+  0.5556573    16658.186     10.0568121     301495.641     NON-DEG (Vs) :    0    1    0
+
+  0.6609458    19814.656     10.1621006     304652.111     NON-DEG (Vs) :    0    0    1
+
+                     *****************************
+                      VIBRATIONAL INERTIAL DEFECT 
+                     *****************************
+
+                              IAA + IBB - ICC 
+
+       DEFECT (AMU A**2)            DEFECT (CM)            VIBRATIONAL STATE 
+
+         0.0217106259              0.0012878812      NON-DEG (Vs) :    0    0    0
+
+        -0.0110566689             -0.0006558851      NON-DEG (Vs) :    1    0    0
+
+         0.0388477702              0.0023044621      NON-DEG (Vs) :    0    1    0
+
+         0.0807620281              0.0047908292      NON-DEG (Vs) :    0    0    1
+
+        -0.0438239636             -0.0025996515      NON-DEG (Vs) :    2    0    0
+
+         0.0559849146              0.0033210429      NON-DEG (Vs) :    0    2    0
+
+         0.1398134302              0.0082937772      NON-DEG (Vs) :    0    0    2
+
+         0.0060804755              0.0003606957      NON-DEG (Vs) :    1    1    0
+
+         0.0479947333              0.0028470628      NON-DEG (Vs) :    1    0    1
+
+         0.0978991724              0.0058074101      NON-DEG (Vs) :    0    1    1
+
+***************************************** 
+ SEXTIC CENTRIFUGAL DISTORTION CONSTANTS 
+***************************************** 
+
+
+ SEXTIC DISTORTION CONSTANTS 
+                       IN CM-1                  IN Hz
+ PHI aaa          0.2924737198D-36         0.8768141536D-26
+ PHI bbb         -0.1719869510D-05        -0.5156039079D+05
+ PHI ccc         -0.1779110180D-07        -0.5333638139D+03
+
+ PHI aab          0.8455694545D-21         0.2534953452D-10
+ PHI abb          0.3398203095D-06         0.1018755659D+05
+ PHI aac          0.4144661355D-05         0.1242538215D+06
+ PHI bbc         -0.2108253362D-05        -0.6320384574D+05
+ PHI acc          0.2142394526D-05         0.6422737210D+05
+ PHI bcc         -0.1056744599D-06        -0.3168040608D+04
+ PHI abc         -0.9059069904D-06        -0.2715840834D+05
+
+
+ REPRESENTATION =     1
+ WHERE :   1 =   I r
+           2 =  II r 
+           3 = III r 
+           4 =   I l 
+           5 =  II l 
+           6 = III l 
+
+
+ ASYMMETRIC TOP REDUCTION 
+  ASYMMETRIC TOP PARAMETER KAPPA :  -1.7992861869
+  ASYMMETRIC TOP PARAMETER SIGMA :        6.0044653163
+
+
+ CONSTANTS IN THE A REDUCED HAMILTONIAN 
+
+                       IN CM-1                  IN Hz
+  PHI J  :        -0.8688303060D-06        -0.2604687730D+05
+  PHI K  :         0.1028337118D-04         0.3082877122D+06
+  PHI JK :         0.9520209988D-05         0.2854087153D+06
+  PHI KJ :        -0.1893475086D-04        -0.5676495502D+06
+  phi j  :        -0.4255196021D-06        -0.1275675674D+05
+  phi jk :        -0.1133051074D-05        -0.3396801666D+05
+  phi k  :         0.1711836148D-04         0.5131955665D+06
+
+
+ SYMMETRIC TOP REDUCTION 
+  ASYMMETRIC TOP PARAMETER KAPPA :   0.4289357118
+  ASYMMETRIC TOP PARAMETER BO :        0.0000000000
+  rho   :     0.1120065510D-03
+  mu    :    -0.2560541753D-07
+  nu    :     0.1662610329D-07
+  lambda :     0.3888758449D-07
+
+
+ CONSTANTS IN THE S REDUCED HAMILTONIAN 
+
+                       IN CM-1                  IN Hz
+  H J  :        -0.8586475034D-06        -0.2574160456D+05
+  H JK :         0.4404605895D-05         0.1320467628D+06
+  H KJ :        -0.2035479257D-05        -0.6102213297D+05
+  H K  :        -0.1510479135D-05        -0.4528302526D+05
+  h 1  :        -0.4781313209D-06        -0.1433401639D+05
+  h 2  :        -0.5091401277D-08        -0.1526363703D+03
+  h 3  :         0.5261171884D-07         0.1577259651D+04
+
+ THIS IS X1CALC --- patched ad hoc by JM for TJL
+ <>
+ <>
+
+                              ******************************
+                               ANHARMONIC CONSTANTS IN CM-1
+                              ******************************
+
+
+
+****************************************************
+ CONTRIBUTIONS TO THE DIAGONAL ANHARMONIC CONSTANTS 
+****************************************************
+
+
+     R  R       QUARTIC           CUBIC            X
+
+     1  1       -76.7744598    -97.7973569     -174.572
+     2  2        20.6248003    -87.2885736      -66.664
+     3  3       992.5181076   -141.6313755      850.887
+
+*********************************************************
+ CONTRIBUTIONS TO THE OFF DIAGONAL ANHARMONIC CONSTANTS
+*********************************************************
+
+
+     R  S       QUARTIC         CUBIC         CUBIC         ROT CON & ZETA       X
+
+     2  1       167.0038812   -214.6791714   -124.7457862      0.0079543     -172.413
+     3  1      -338.9276803    146.6575488     -6.6421881     39.5375963     -159.375
+     3  2      -787.4004899    111.5978645    101.5850703      0.0000000     -574.218
+
+ ANHARMONIC CONSTANTS X IN CM-1
+
+             1           2           3
+  ------------------------------------------
+   1      -174.572
+   2      -172.413     -66.664
+   3      -159.375    -574.218     850.887
+
+                          **********************
+                           BAND CENTER ANALYSIS
+                          **********************
+  MODE         HARMONIC        FUNDAMENTAL       DIFFERENCE
+
+    1          3846.662         3331.624          515.038
+    2          3719.096         3212.453          506.643
+
+ WARNING - A POSITIVE ANHARMONIC CORRECTION HAS
+ BEEN FOUND AND IS MARKED. CHECK THE FORCE FIELD!
+
+    3*         1692.409         3027.386        -1334.977
+ E0 IS THE DUNHAM COEF  
+ ONLY RELEVANT IN THERMODYNAMICS  
+ ************************* 
+ KKKK SUMMED COMPONENT IS    234.092112027891     
+ KKK  SUMMED COMPONENT IS   -21.6767654569319     
+ KKL  SUMMED COMPONENT IS   -9.73129698862401     
+ KLM  SUMMED COMPONENT IS   6.589563943969337E-014
+ E_o IS     202.684049582335     
+ ************************* 
+
+                         ************************************************
+                          VIBRATIONAL ENERGY AND PROPERTIES IN RESONANCE
+                         ************************************************
+
+
+  Note: zero point energy (ZPE) includes E_0  
+
+
+ STATE NO.     ENERGY (CM-1)         ABOVE ZPT                    VIBRATIONAL STATE
+
+
+     1           4757.6787              0.0000       NON-DEG (Vs) :    0    0    0
+
+     4           7785.0651           3027.3865       NON-DEG (Vs) :    0    0    1
+
+     3           7970.1315           3212.4528       NON-DEG (Vs) :    0    1    0
+
+     2           8089.3027           3331.6240       NON-DEG (Vs) :    1    0    0
+
+    10          10423.3004           5665.6217       NON-DEG (Vs) :    0    1    1
+
+     9          10957.3144           6199.6357       NON-DEG (Vs) :    1    0    1
+
+     6          11049.2567           6291.5781       NON-DEG (Vs) :    0    2    0
+
+     5          11071.7831           6314.1044       NON-DEG (Vs) :    2    0    0
+
+     8          11129.3424           6371.6637       NON-DEG (Vs) :    1    1    0
+
+     7          12514.2251           7756.5464       NON-DEG (Vs) :    0    0    2
+
+ ************************************************ 
+
+         ROTATIONAL ENERGY LEVEL ANALYSIS 
+
+ ************************************************ 
+ <>
+ USING MAIN INPUT VALUE OF IPRNT
+
+  VIBRATIONAL STATE
+   NON-DEG(Vt) :     0    0    0
+
+ ROTATIONAL CONSTANTS (CM-1)
+        BXA               BYA               BZA
+     14.9535971         9.8369601        27.7535914
+
+ ROTATIONAL CONSTANTS (CM-1)
+        BXS               BYS               BZS
+     14.9618132         9.8300072        27.7520125
+
+ ROTATIONAL ENERGY MATRIX FOR A REDUCTION WITH J=    0
+
+    Kc    Ka     ROTATIONAL ENERGY (CM-1)     ROTATIONAL ENERGY (MHz)   SYMMETRY TYPE
+     0     0           0.0000000                         0.00                A
+
+ ROTATIONAL ENERGY MATRIX FOR A REDUCTION WITH J=    1
+
+    Kc    Ka     ROTATIONAL ENERGY (CM-1)     ROTATIONAL ENERGY (MHz)   SYMMETRY TYPE
+     1     0          24.7890721                    743157.68                BC
+     1     1          37.5775970                   1126548.02                BB
+     0     1          42.7084293                   1280366.50                BA
+
+ ROTATIONAL ENERGY MATRIX FOR A REDUCTION WITH J=    2
+
+    Kc    Ka     ROTATIONAL ENERGY (CM-1)     ROTATIONAL ENERGY (MHz)   SYMMETRY TYPE
+     2     0          73.0913130                   2191222.44                A
+     2     1          82.0002828                   2458306.63                BA
+     1     1          97.3864040                   2919570.94                BB
+     1     2         135.7595417                   4069968.67                BC
+     0     2         137.0264091                   4107948.40                A
+
+ ROTATIONAL ENERGY MATRIX FOR A REDUCTION WITH J=    3
+
+    Kc    Ka     ROTATIONAL ENERGY (CM-1)     ROTATIONAL ENERGY (MHz)   SYMMETRY TYPE
+     3     0         142.7882009                   4280682.57                BC
+     3     1         147.8932368                   4433727.70                BB
+     2     1         178.4409041                   5349523.73                BA
+     2     2         209.9782422                   6294989.34                A
+     1     2         215.8786688                   6471879.68                BC
+     1     3         287.5432156                   8620328.74                BB
+     0     3         287.7480512                   8626469.56                BA
+
+ ROTATIONAL ENERGY MATRIX FOR S REDUCTION WITH J=    0
+
+    Kc    Ka     ROTATIONAL ENERGY (CM-1)     ROTATIONAL ENERGY (MHz)   SYMMETRY TYPE
+     0     0           0.0000000                         0.00                A
+
+ ROTATIONAL ENERGY MATRIX FOR S REDUCTION WITH J=    1
+
+    Kc    Ka     ROTATIONAL ENERGY (CM-1)     ROTATIONAL ENERGY (MHz)   SYMMETRY TYPE
+     1     0          24.7890722                    743157.69                BC
+     1     1          37.5776288                   1126548.97                BB
+     0     1          42.7084008                   1280365.65                BA
+
+ ROTATIONAL ENERGY MATRIX FOR S REDUCTION WITH J=    2
+
+    Kc    Ka     ROTATIONAL ENERGY (CM-1)     ROTATIONAL ENERGY (MHz)   SYMMETRY TYPE
+     2     0          73.0915918                   2191230.80                A
+     2     1          82.0002637                   2458306.06                BA
+     1     1          97.3862384                   2919565.98                BB
+     1     2         135.7596755                   4069972.68                BC
+     0     2         137.0262648                   4107944.07                A
+
+ ROTATIONAL ENERGY MATRIX FOR S REDUCTION WITH J=    3
+
+    Kc    Ka     ROTATIONAL ENERGY (CM-1)     ROTATIONAL ENERGY (MHz)   SYMMETRY TYPE
+     3     0         142.7893343                   4280716.55                BC
+     3     1         147.8936967                   4433741.48                BB
+     2     1         178.4413428                   5349536.88                BA
+     2     2         209.9778104                   6294976.39                A
+     1     2         215.8771066                   6471832.84                BC
+     1     3         287.5435392                   8620338.44                BB
+     0     3         287.7482054                   8626474.18                BA
+
+  VIBRATIONAL STATE
+   NON-DEG(Vt) :     1    0    0
+
+ ROTATIONAL CONSTANTS (CM-1)
+        BXA               BYA               BZA
+     15.6331405         9.9562299        27.8038072
+
+ ROTATIONAL CONSTANTS (CM-1)
+        BXS               BYS               BZS
+     15.6413565         9.9492770        27.8022283
+
+ ROTATIONAL ENERGY MATRIX FOR A REDUCTION WITH J=    0
+
+    Kc    Ka     ROTATIONAL ENERGY (CM-1)     ROTATIONAL ENERGY (MHz)   SYMMETRY TYPE
+     0     0           0.0000000                         0.00                A
+
+ ROTATIONAL ENERGY MATRIX FOR A REDUCTION WITH J=    1
+
+    Kc    Ka     ROTATIONAL ENERGY (CM-1)     ROTATIONAL ENERGY (MHz)   SYMMETRY TYPE
+     1     0          25.5878853                    767105.50                BC
+     1     1          37.7470827                   1131629.07                BB
+     0     1          43.4381884                   1302244.13                BA
+
+ ROTATIONAL ENERGY MATRIX FOR A REDUCTION WITH J=    2
+
+    Kc    Ka     ROTATIONAL ENERGY (CM-1)     ROTATIONAL ENERGY (MHz)   SYMMETRY TYPE
+     2     0          75.1694945                   2253524.75                A
+     2     1          83.2071214                   2494486.74                BA
+     1     1         100.2740630                   3006140.78                BB
+     1     2         136.7592180                   4099938.21                BC
+     0     2         138.3443434                   4147459.08                A
+
+ ROTATIONAL ENERGY MATRIX FOR A REDUCTION WITH J=    3
+
+    Kc    Ka     ROTATIONAL ENERGY (CM-1)     ROTATIONAL ENERGY (MHz)   SYMMETRY TYPE
+     3     0         146.2209697                   4383594.39                BC
+     3     1         150.4846046                   4511414.95                BB
+     2     1         184.3070847                   5525387.39                BA
+     2     2         213.3743581                   6396802.33                A
+     1     2         220.6348952                   6614467.76                BC
+     1     3         289.3648775                   8674940.79                BB
+     0     3         289.6565413                   8683684.65                BA
+
+ ROTATIONAL ENERGY MATRIX FOR S REDUCTION WITH J=    0
+
+    Kc    Ka     ROTATIONAL ENERGY (CM-1)     ROTATIONAL ENERGY (MHz)   SYMMETRY TYPE
+     0     0           0.0000000                         0.00                A
+
+ ROTATIONAL ENERGY MATRIX FOR S REDUCTION WITH J=    1
+
+    Kc    Ka     ROTATIONAL ENERGY (CM-1)     ROTATIONAL ENERGY (MHz)   SYMMETRY TYPE
+     1     0          25.5878854                    767105.50                BC
+     1     1          37.7471144                   1131630.02                BB
+     0     1          43.4381599                   1302243.27                BA
+
+ ROTATIONAL ENERGY MATRIX FOR S REDUCTION WITH J=    2
+
+    Kc    Ka     ROTATIONAL ENERGY (CM-1)     ROTATIONAL ENERGY (MHz)   SYMMETRY TYPE
+     2     0          75.1707788                   2253563.25                A
+     2     1          83.2071023                   2494486.17                BA
+     1     1         100.2738974                   3006135.82                BB
+     1     2         136.7593518                   4099942.22                BC
+     0     2         138.3431937                   4147424.61                A
+
+ ROTATIONAL ENERGY MATRIX FOR S REDUCTION WITH J=    3
+
+    Kc    Ka     ROTATIONAL ENERGY (CM-1)     ROTATIONAL ENERGY (MHz)   SYMMETRY TYPE
+     3     0         146.2263187                   4383754.75                BC
+     3     1         150.4873657                   4511497.73                BB
+     2     1         184.3105944                   5525492.61                BA
+     2     2         213.3739263                   6396789.38                A
+     1     2         220.6291174                   6614294.54                BC
+     1     3         289.3628999                   8674881.50                BB
+     0     3         289.6536243                   8683597.20                BA
+
+  VIBRATIONAL STATE
+   NON-DEG(Vt) :     0    1    0
+
+ ROTATIONAL CONSTANTS (CM-1)
+        BXA               BYA               BZA
+     15.1391907        10.0586491        28.1748033
+
+ ROTATIONAL CONSTANTS (CM-1)
+        BXS               BYS               BZS
+     15.1474068        10.0516962        28.1732244
+
+ ROTATIONAL ENERGY MATRIX FOR A REDUCTION WITH J=    0
+
+    Kc    Ka     ROTATIONAL ENERGY (CM-1)     ROTATIONAL ENERGY (MHz)   SYMMETRY TYPE
+     0     0           0.0000000                         0.00                A
+
+ ROTATIONAL ENERGY MATRIX FOR A REDUCTION WITH J=    1
+
+    Kc    Ka     ROTATIONAL ENERGY (CM-1)     ROTATIONAL ENERGY (MHz)   SYMMETRY TYPE
+     1     0          25.1963547                    755367.71                BC
+     1     1          38.2204980                   1145821.70                BB
+     0     1          43.3152348                   1298558.07                BA
+
+ ROTATIONAL ENERGY MATRIX FOR A REDUCTION WITH J=    2
+
+    Kc    Ka     ROTATIONAL ENERGY (CM-1)     ROTATIONAL ENERGY (MHz)   SYMMETRY TYPE
+     2     0          74.3473234                   2228876.68                A
+     2     1          83.4938445                   2503082.49                BA
+     1     1          98.7716794                   2961100.45                BB
+     1     2         137.8516719                   4132689.15                BC
+     0     2         139.0843768                   4169644.72                A
+
+ ROTATIONAL ENERGY MATRIX FOR A REDUCTION WITH J=    3
+
+    Kc    Ka     ROTATIONAL ENERGY (CM-1)     ROTATIONAL ENERGY (MHz)   SYMMETRY TYPE
+     3     0         145.3766148                   4358281.27                BC
+     3     1         150.6810954                   4517305.60                BB
+     2     1         181.0219784                   5426902.38                BA
+     2     2         213.2922204                   6394339.90                A
+     1     2         219.0479290                   6566891.71                BC
+     1     3         291.9267407                   8751743.52                BB
+     0     3         292.1217881                   8757590.89                BA
+
+ ROTATIONAL ENERGY MATRIX FOR S REDUCTION WITH J=    0
+
+    Kc    Ka     ROTATIONAL ENERGY (CM-1)     ROTATIONAL ENERGY (MHz)   SYMMETRY TYPE
+     0     0           0.0000000                         0.00                A
+
+ ROTATIONAL ENERGY MATRIX FOR S REDUCTION WITH J=    1
+
+    Kc    Ka     ROTATIONAL ENERGY (CM-1)     ROTATIONAL ENERGY (MHz)   SYMMETRY TYPE
+     1     0          25.1963548                    755367.71                BC
+     1     1          38.2205297                   1145822.65                BB
+     0     1          43.3152063                   1298557.22                BA
+
+ ROTATIONAL ENERGY MATRIX FOR S REDUCTION WITH J=    2
+
+    Kc    Ka     ROTATIONAL ENERGY (CM-1)     ROTATIONAL ENERGY (MHz)   SYMMETRY TYPE
+     2     0          74.3474444                   2228880.31                A
+     2     1          83.4938254                   2503081.91                BA
+     1     1          98.7715137                   2961095.49                BB
+     1     2         137.8518057                   4132693.17                BC
+     0     2         139.0843903                   4169645.12                A
+
+ ROTATIONAL ENERGY MATRIX FOR S REDUCTION WITH J=    3
+
+    Kc    Ka     ROTATIONAL ENERGY (CM-1)     ROTATIONAL ENERGY (MHz)   SYMMETRY TYPE
+     3     0         145.3770627                   4358294.70                BC
+     3     1         150.6811907                   4517308.45                BB
+     2     1         181.0219478                   5426901.47                BA
+     2     2         213.2917885                   6394326.96                A
+     1     2         219.0470522                   6566865.42                BC
+     1     3         291.9274289                   8751764.15                BB
+     0     3         292.1224114                   8757609.57                BA
+
+  VIBRATIONAL STATE
+   NON-DEG(Vt) :     0    0    1
+
+ ROTATIONAL CONSTANTS (CM-1)
+        BXA               BYA               BZA
+     14.8445637        10.1639376        28.2241658
+
+ ROTATIONAL CONSTANTS (CM-1)
+        BXS               BYS               BZS
+     14.8527798        10.1569847        28.2225869
+
+ ROTATIONAL ENERGY MATRIX FOR A REDUCTION WITH J=    0
+
+    Kc    Ka     ROTATIONAL ENERGY (CM-1)     ROTATIONAL ENERGY (MHz)   SYMMETRY TYPE
+     0     0           0.0000000                         0.00                A
+
+ ROTATIONAL ENERGY MATRIX FOR A REDUCTION WITH J=    1
+
+    Kc    Ka     ROTATIONAL ENERGY (CM-1)     ROTATIONAL ENERGY (MHz)   SYMMETRY TYPE
+     1     0          25.0070162                    749691.49                BC
+     1     1          38.3751490                   1150458.02                BB
+     0     1          43.0699703                   1291205.23                BA
+
+ ROTATIONAL ENERGY MATRIX FOR A REDUCTION WITH J=    2
+
+    Kc    Ka     ROTATIONAL ENERGY (CM-1)     ROTATIONAL ENERGY (MHz)   SYMMETRY TYPE
+     2     0          73.9710661                   2217596.77                A
+     2     1          83.6697340                   2508355.52                BA
+     1     1          97.7478224                   2930406.00                BB
+     1     2         137.8597835                   4132932.34                BC
+     0     2         138.9007302                   4164139.13                A
+
+ ROTATIONAL ENERGY MATRIX FOR A REDUCTION WITH J=    3
+
+    Kc    Ka     ROTATIONAL ENERGY (CM-1)     ROTATIONAL ENERGY (MHz)   SYMMETRY TYPE
+     3     0         145.0874860                   4349613.41                BC
+     3     1         150.9938861                   4526682.83                BB
+     2     1         178.9800929                   5365688.20                BA
+     2     2         212.7323165                   6377554.41                A
+     1     2         217.6411230                   6524716.72                BC
+     1     3         291.9819525                   8753398.72                BB
+     0     3         292.1321830                   8757902.52                BA
+
+ ROTATIONAL ENERGY MATRIX FOR S REDUCTION WITH J=    0
+
+    Kc    Ka     ROTATIONAL ENERGY (CM-1)     ROTATIONAL ENERGY (MHz)   SYMMETRY TYPE
+     0     0           0.0000000                         0.00                A
+
+ ROTATIONAL ENERGY MATRIX FOR S REDUCTION WITH J=    1
+
+    Kc    Ka     ROTATIONAL ENERGY (CM-1)     ROTATIONAL ENERGY (MHz)   SYMMETRY TYPE
+     1     0          25.0070163                    749691.49                BC
+     1     1          38.3751808                   1150458.98                BB
+     0     1          43.0699418                   1291204.37                BA
+
+ ROTATIONAL ENERGY MATRIX FOR S REDUCTION WITH J=    2
+
+    Kc    Ka     ROTATIONAL ENERGY (CM-1)     ROTATIONAL ENERGY (MHz)   SYMMETRY TYPE
+     2     0          73.9705401                   2217581.00                A
+     2     1          83.6697150                   2508354.95                BA
+     1     1          97.7476568                   2930401.03                BB
+     1     2         137.8599173                   4132936.35                BC
+     0     2         138.9013908                   4164158.94                A
+
+ ROTATIONAL ENERGY MATRIX FOR S REDUCTION WITH J=    3
+
+    Kc    Ka     ROTATIONAL ENERGY (CM-1)     ROTATIONAL ENERGY (MHz)   SYMMETRY TYPE
+     3     0         145.0850593                   4349540.65                BC
+     3     1         150.9924810                   4526640.70                BB
+     2     1         178.9781790                   5365630.82                BA
+     2     2         212.7318847                   6377541.46                A
+     1     2         217.6431209                   6524776.62                BC
+     1     3         291.9841410                   8753464.33                BB
+     0     3         292.1346896                   8757977.67                BA
+
+ ************************************************ 
+        VIBRATIONALLY AVERAGED COORDINATES        
+ ************************************************ 
+
+
+
+ FOR THE GROUND STATE, R(ALPHA) EQUALS R(Z) 
+
+
+ VIBRATIONAL STATE 
+ 1-DEGN :    0    0    0
+
+ INT COORD TYPE     R(EQUIL)      R(G)          R(ALPHA)
+
+ 1)    BOND         0.9585819     0.9564854     0.9528741
+ 2)    BOND         0.9585819     0.9570116     0.9535267
+ 3)    ANGLE      104.3994718   103.5450611   103.9004555
+
+ VIBRATIONAL STATE 
+ 1-DEGN :    1    0    0
+
+ INT COORD TYPE     R(EQUIL)      R(G)          R(ALPHA)
+
+ 1)    BOND         0.9585819     0.9412891     0.9363856
+ 2)    BOND         0.9585819     0.9724388     0.9665393
+ 3)    ANGLE      104.3994718   103.0798158   103.7392990
+
+ VIBRATIONAL STATE 
+ 1-DEGN :    0    1    0
+
+ INT COORD TYPE     R(EQUIL)      R(G)          R(ALPHA)
+
+ 1)    BOND         0.9585819     0.9434682     0.9386195
+ 2)    BOND         0.9585819     0.9680248     0.9621541
+ 3)    ANGLE      104.3994718   103.2578539   103.6395551
+
+ VIBRATIONAL STATE 
+ 1-DEGN :    0    0    1
+
+ INT COORD TYPE     R(EQUIL)      R(G)          R(ALPHA)
+
+ 1)    BOND         0.9585819     0.9805059     0.9722015
+ 2)    BOND         0.9585819     0.9274305     0.9217764
+ 3)    ANGLE      104.3994718   102.5886918   103.3244800

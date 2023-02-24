@@ -39,6 +39,7 @@ impl Target {
 }
 
 pub fn read_input_toml(path: &PathBuf) -> Target {
+    println!("Reading input file: {:?}", path);
     let mut file = std::fs::File::open(path).unwrap();
     let mut contents = String::new();
     file.read_to_string(&mut contents).unwrap();

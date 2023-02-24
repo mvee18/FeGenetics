@@ -1,0 +1,24 @@
+                    ************SUM RULE SUMMARY************
+                                ----------------
+
+ 
+ 
+ A(AC)**2                : NOT OBEYED, DIFFERENCE = 4.0621691
+ A(BC)**2                : NOT OBEYED, DIFFERENCE = 1.7638175
+ 
+ A(BB)*A(AC)             : NOT OBEYED, DIFFERENCE = 1.1700993
+ 
+ A(BB)*A(AB)             : NOT OBEYED, DIFFERENCE =-1.3116359
+ A(CC)*A(AC)             : NOT OBEYED, DIFFERENCE = 1.1700993
+ A(CC)*A(BC)             : NOT OBEYED, DIFFERENCE =-1.3116359
+ 
+ A(AC)*A(BC)             : NOT OBEYED, DIFFERENCE = 0.6314292
+ 
+ ZETA(K,L,B)**2          : NOT OBEYED, DIFFERENCE = 2.0000000
+ 
+ A(BB)*ZETA(K,L,B)       : NOT OBEYED  K= 1  DIFFERENCE = 0.5540583
+ A(BB)*ZETA(K,L,B)       : NOT OBEYED  K= 2  DIFFERENCE = 0.5730639
+ A(BB)*ZETA(K,L,B)       : NOT OBEYED  K= 3  DIFFERENCE = 1.7238199
+ 
+
+                    ****************************************

@@ -5,6 +5,6 @@ mod utils;
 use traditional::traditional::run_tga;
 
 fn main() {
-    // run_spectro(organism_id)
+    // run_spectro(1234.to_string());
     run_tga();
 }

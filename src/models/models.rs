@@ -36,7 +36,7 @@ lazy_static! {
     pub static ref INITIAL_GUESS: &'static str = TARGET.initial_guess.as_str();
     pub static ref EXE_DIR_PATH: PathBuf = get_executable_path();
     pub static ref SPECTRO_PATH: String = TARGET.spectro_path.clone();
-            pub static ref SPECTRO_IN_PATH: String = TARGET.spectro_in_path.clone();
+    pub static ref SPECTRO_IN_PATH: String = TARGET.spectro_in_path.clone();
     // This is for the simple organisms.
     // #[derive(Clone, Copy)]
     // pub static ref TARGET: Target = Target::initialize(&PathBuf::from("/home/mvee/rust/fegenetics/tests/simple/target.toml"));
@@ -415,7 +415,7 @@ impl Organism for ForceOrganism {
                 // println!("The test freqs are {:?}\n", organism_freqs);
 
                 let mut hfitness = 0.0;
-                for (c, freq) in freqs.lxm_freqs.iter().enumerate() {
+                for (c, freq) in freqs.harms.iter().enumerate() {
                     hfitness +=
                         difference_squared(*freq, target.harm[c]) / (target.harm.len() as f64);
                 }
@@ -423,7 +423,9 @@ impl Organism for ForceOrganism {
                 self.harmfitness = hfitness;
 
                 let mut rfitness = 0.0;
-                for (c, rot) in freqs.rots[0].iter().enumerate() {
+                let first_rot = &freqs.rots[0];
+                let rots_vec = vec![first_rot.a, first_rot.b, first_rot.c];
+                for (c, rot) in rots_vec.iter().enumerate() {
                     rfitness +=
                         difference_squared(*rot, target.rots[c]) / (target.rots.len() as f64);
                 }
@@ -431,7 +433,7 @@ impl Organism for ForceOrganism {
                 self.rotfitness = rfitness;
 
                 let mut ffitness = 0.0;
-                for (c, freq) in freqs.fund.iter().enumerate() {
+                for (c, freq) in freqs.funds.iter().enumerate() {
                     ffitness +=
                         difference_squared(*freq, target.fund[c]) / (target.fund.len() as f64);
                 }
@@ -493,11 +495,11 @@ impl Organism for ForceOrganism {
         for i in 0..self.dna.len() {
             let mut file = File::create(organisms_dir.join(format!("{}", FORT_FILES[i])))
                 .expect("Could not create file.");
-            let header = format!("{:>5}{:>5}", *NUMBER_ATOMS, self.dna[i].len());
-            file.write(header.as_bytes())
-                .expect("Could not write to file.");
+            // let header = format!("{:>5}{:>5}", *NUMBER_ATOMS, self.dna[i].len());
+            // file.write(header.as_bytes())
+            //     .expect("Could not write to file.");
             for j in 0..self.dna[i].len() {
-                if j % 3 == 0 {
+                if j % 3 == 0 && j != 0 {
                     file.write("\n".as_bytes())
                         .expect("Could not write to file.");
                 }
@@ -1430,7 +1432,7 @@ mod tests {
     fn test_create_organism() {
         // Ensure the DNA length is correct.
         let o = SimpleOrganism::new(DNA_SIZE.try_into().unwrap());
-        assert_eq!(o.dna.len(), DNA_SIZE.try_into().unwrap());
+        assert_eq!(o.dna.len(), TryInto::<usize>::try_into(DNA_SIZE).unwrap());
 
         // Ensure that the bounds are obeyed.
         for dna in o.dna.iter() {
