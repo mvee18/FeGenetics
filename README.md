@@ -23,18 +23,18 @@ The program reads configuration from a `target.toml` file that must be in the sa
 ### Configuration File Format
 
 ```toml
-# Target spectroscopic values
-harm = [3943.976, 3833.989, 1651.332, 0.02, 0.0, 0.0, 0.0, 0.0, 0.0]
-rots = [27.655730, 14.5054957, 9.2636424]
-fund = [3753.156, 3656.489, 1598.834]
+# Target spectroscopic values (frequencies in cm^-1, rotational constants in cm^-1)
+harm = [3943.976, 3833.989, 1651.332, 0.02, 0.0, 0.0, 0.0, 0.0, 0.0]  # Harmonic frequencies
+rots = [27.655730, 14.5054957, 9.2636424]  # Rotational constants (A, B, C)
+fund = [3753.156, 3656.489, 1598.834]  # Fundamental frequencies
 
 # Genetic algorithm parameters
 number_atoms = 3
 population_size = 2000
 tournament_size = 150
-mutation_rate = 0.20
-mutation_strength = 5e-9
-fitness_threshold = 1.0
+mutation_rate = 0.20  # Probability of mutation (0.0 to 1.0)
+mutation_strength = 5e-9  # Step size for mutations in force constant units
+fitness_threshold = 1.0  # Stop when fitness reaches this value or lower
 
 # Paths (relative to executable directory)
 initial_guess = ""  # Leave empty for random initialization, or provide path to initial guess
@@ -44,18 +44,18 @@ spectro_in_path = "./spectro.in"
 
 ### Configuration Parameters
 
-- **harm**: Harmonic frequencies (target values)
-- **rots**: Rotational constants in ABC order (target values)
-- **fund**: Fundamental frequencies (target values)
+- **harm**: Harmonic frequencies (target values in cm⁻¹). The array length depends on the molecule's normal modes.
+- **rots**: Rotational constants in ABC order (target values in cm⁻¹)
+- **fund**: Fundamental frequencies (target values in cm⁻¹)
 - **number_atoms**: Number of atoms in the molecule
-- **population_size**: Size of the population for the genetic algorithm
-- **tournament_size**: Number of organisms in each tournament selection
-- **mutation_rate**: Probability of mutation (0.0 to 1.0)
-- **mutation_strength**: Strength of mutations
-- **fitness_threshold**: Fitness value below which the algorithm stops (convergence criterion)
-- **initial_guess**: Path to an initial guess organism (optional, leave empty for random)
+- **population_size**: Size of the population for the genetic algorithm (larger = more exploration, slower)
+- **tournament_size**: Number of organisms in each tournament selection (affects selection pressure)
+- **mutation_rate**: Probability of mutation (0.0 to 1.0). Typical values: 0.1-0.3
+- **mutation_strength**: Step size for mutations in force constant units. Start with small values (1e-9 to 1e-8) and adjust based on convergence
+- **fitness_threshold**: Fitness value below which the algorithm stops (convergence criterion). Lower = better fit
+- **initial_guess**: Path to an initial guess organism (optional, leave empty for random initialization)
 - **spectro_path**: Path to the spectro executable
-- **spectro_in_path**: Path to the spectro input file
+- **spectro_in_path**: Path to the spectro input file (defines molecular geometry and calculation parameters)
 
 ## Running the Program
 
@@ -147,7 +147,10 @@ Run the test suite:
 cargo test
 ```
 
-Note: Some tests may fail if run outside the expected environment, as they reference specific file paths.
+**Note**: Some tests require specific file paths and may fail when run from different environments. The tests are designed to validate the algorithm logic and file I/O operations. If you encounter path-related test failures, you can:
+- Run individual tests: `cargo test test_name`
+- Focus on the core algorithm tests that don't depend on file paths
+- Update the hard-coded paths in the test files to match your environment (for development only)
 
 ## Troubleshooting
 
