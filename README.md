@@ -44,14 +44,14 @@ spectro_in_path = "./spectro.in"
 
 ### Configuration Parameters
 
-- **harm**: Harmonic frequencies (target values in cm⁻¹). The array length depends on the molecule's normal modes.
+- **harm**: Harmonic frequencies (target values in cm⁻¹). The array length depends on the molecule's normal modes (3N-6 for non-linear molecules, 3N-5 for linear molecules, where N is the number of atoms).
 - **rots**: Rotational constants in ABC order (target values in cm⁻¹)
 - **fund**: Fundamental frequencies (target values in cm⁻¹)
 - **number_atoms**: Number of atoms in the molecule
 - **population_size**: Size of the population for the genetic algorithm (larger = more exploration, slower)
 - **tournament_size**: Number of organisms in each tournament selection (affects selection pressure)
 - **mutation_rate**: Probability of mutation (0.0 to 1.0). Typical values: 0.1-0.3
-- **mutation_strength**: Step size for mutations in force constant units. Start with small values (1e-9 to 1e-8) and adjust based on convergence
+- **mutation_strength**: Step size for mutations. This is a dimensionless scaling factor applied to force constants. Start with small values (1e-9 to 1e-8) and adjust based on convergence behavior
 - **fitness_threshold**: Fitness value below which the algorithm stops (convergence criterion). Lower = better fit
 - **initial_guess**: Path to an initial guess organism (optional, leave empty for random initialization)
 - **spectro_path**: Path to the spectro executable
