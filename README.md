@@ -44,9 +44,9 @@ spectro_in_path = "./spectro.in"
 
 ### Configuration Parameters
 
-- **harm**: Harmonic frequencies (target values in cm⁻¹). The array length depends on the molecule's normal modes (3N-6 for non-linear molecules, 3N-5 for linear molecules, where N is the number of atoms).
+- **harm**: Harmonic frequencies (target values in cm⁻¹). The array includes the fundamental vibrational modes plus additional harmonic terms. For water (3 atoms), this includes 3 fundamental modes plus 6 additional harmonic terms.
 - **rots**: Rotational constants in ABC order (target values in cm⁻¹)
-- **fund**: Fundamental frequencies (target values in cm⁻¹)
+- **fund**: Fundamental frequencies (target values in cm⁻¹). For non-linear molecules: 3N-6 modes; for linear molecules: 3N-5 modes (where N = number of atoms)
 - **number_atoms**: Number of atoms in the molecule
 - **population_size**: Size of the population for the genetic algorithm (larger = more exploration, slower)
 - **tournament_size**: Number of organisms in each tournament selection (affects selection pressure)
