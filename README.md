@@ -44,7 +44,7 @@ spectro_in_path = "./spectro.in"
 
 ### Configuration Parameters
 
-- **harm**: Harmonic frequencies (target values in cm⁻¹). The array includes the fundamental vibrational modes plus additional harmonic terms. For water (3 atoms), this includes 3 fundamental modes plus 6 additional harmonic terms.
+- **harm**: Harmonic frequencies (target values in cm⁻¹). Array length must match the output from the spectro program.
 - **rots**: Rotational constants in ABC order (target values in cm⁻¹)
 - **fund**: Fundamental frequencies (target values in cm⁻¹). For non-linear molecules: 3N-6 modes; for linear molecules: 3N-5 modes (where N = number of atoms)
 - **number_atoms**: Number of atoms in the molecule
